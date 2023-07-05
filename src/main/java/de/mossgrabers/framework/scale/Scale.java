@@ -40,6 +40,21 @@ public enum Scale
     /** The Locrian scale. */
     LOCRIAN("Locrian", new int []                      { 0, 1, 3, 5, 6, 8, 10 }),
 
+    /** The Melodic Minor scale. */
+    MELODIC_MINOR("Melodic Minor", new int []          { 0, 2, 3, 5, 7, 9, 11 }),
+
+    /** The Harmonic Minor scale. */
+    HARMONIC_MINOR("Harmonic Minor", new int []        { 0, 2, 3, 5, 7, 8, 11 }),
+
+    /** The Harmonic Major scale. */
+    HARMONIC_MAJOR("Harmonic Major", new int []        { 0, 2, 4, 5, 7, 8, 11 }),
+
+    /** The Super Locrian scale. */
+    SUPER_LOCRIAN("Super Locrian", new int []        { 0, 1, 3, 4, 6, 8, 10 }),
+
+     /** The Harmonic Lydian scale. */
+    HARMONIC_LYDIAN("Harmonic Lydian", new int []        { 0, 2, 4, 6, 7, 8, 11 }),
+
     /** The Whole Tone scale. */
     WHOLE_TONE("Whole Tone", new int []                { 0, 2, 4, 6, 8, 10 }),
 
@@ -58,20 +73,11 @@ public enum Scale
     /** The Major Pentatonic scale. */
     MAJOR_PENTATONIC("Major Pentatonic", new int []    { 0, 2, 4, 7, 9 }),
 
-    /** The Harmonic Minor scale. */
-    HARMONIC_MINOR("Harmonic Minor", new int []        { 0, 2, 3, 5, 7, 8, 11 }),
-
-    /** The Harmonic Major scale. */
-    HARMONIC_MAJOR("Harmonic Major", new int []        { 0, 2, 4, 5, 7, 8, 11 }),
-
     /** The Dorian #4 scale. */
     DORIAN_NR_4("Dorian #4", new int []                { 0, 2, 3, 6, 7, 9, 10 }),
 
     /** The Phrygian Dominant scale. */
     PHRYGIAN_DOMINANT("Phrygian Dominant", new int []  { 0, 1, 4, 5, 7, 8, 10 }),
-
-    /** The Melodic Minor scale. */
-    MELODIC_MINOR("Melodic Minor", new int []          { 0, 2, 3, 5, 7, 9, 11 }),
 
     /** The Lydian Augmented scale. */
     LYDIAN_AUGMENTED("Lydian Augmented", new int []    { 0, 2, 4, 6, 8, 9, 11 }),
