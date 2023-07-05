@@ -51,9 +51,54 @@ public enum Scale
 
     /** The Super Locrian scale. */
     SUPER_LOCRIAN("Super Locrian", new int []        { 0, 1, 3, 4, 6, 8, 10 }),
+    
+    /** The Phrygian Dominant scale. */
+    PHRYGIAN_DOMINANT("Phrygian Dominant", new int []  { 0, 1, 4, 5, 7, 8, 10 }),
+ 
+    /** The Major Romani scale. */
+    MAJOR_ROMANI("Major Romani", new int []  { 0, 1, 4, 5, 8, 9, 11 }),
 
-     /** The Harmonic Lydian scale. */
+    /** The Hungarian Minor scale. */
+    HUNGARIAN_MINOR("Hungarian Minor", new int []      { 0, 2, 3, 6, 7, 8, 11 }),
+    
+    /** The Hungarian Major scale. */
+    HUNGARIAN_MAJOR("Hungarian Major", new int []      { 0, 3, 4, 6, 7, 9, 10 }),
+
+    /** The Bhairav scale. */
+    BHAIRAV("Bhairav", new int []                      { 0, 1, 4, 5, 7, 8, 11 }),
+
+    /** The Harmonic Lydian scale. */
     HARMONIC_LYDIAN("Harmonic Lydian", new int []        { 0, 2, 4, 6, 7, 8, 11 }),
+
+    /** The Altered scale. */
+    ALTERED("Altered", new int []                { 0, 1, 3, 4, 6, 8, 10 }),
+
+    /** The Dorian #4 scale. */
+    DORIAN_NR_4("Dorian #4", new int []                { 0, 2, 3, 6, 7, 9, 10 }),
+
+    /** The Lydian Augmented scale. */
+    LYDIAN_AUGMENTED("Lydian Augmented", new int []    { 0, 2, 4, 6, 8, 9, 11 }),
+
+    /** The Lydian Dominant scale. */
+    LYDIAN_DOMINANT("Lydian Dominant", new int []      { 0, 2, 4, 6, 7, 9, 10 }),
+
+    /** The Spanish scale. */
+    SPANISH("Spanish", new int []                      { 0, 1, 4, 5, 7, 9, 10 }),
+
+    /** The Relative Blues scale. */
+    RELATIVE_BLUES("Minor Blues", new int []              { 0, 2, 3, 4, 7, 8, 9 }),
+
+    /** The Minor Blues scale. */
+    MINOR_BLUES("Minor Blues", new int []              { 0, 3, 5, 6, 7, 10 }),
+
+    /** The Modified Blues scale. */
+    MODIFIED_BLUES("Modified Blues", new int []              { 0, 2, 3, 5, 6, 7, 10 }),
+
+    /** Blues Heptatonic II. */
+    HEPTATONIC_BLUES("Blues Hepta-II", new int []              { 0, 3, 5, 6, 7, 9, 10 }),
+
+    /** Bluesy Rock n Roll. */
+    BLUESY_ROCK_ROLL("Bluesy Rock n Roll", new int []              { 0, 3, 5, 6, 7, 9, 10 }),
 
     /** The Whole Tone scale. */
     WHOLE_TONE("Whole Tone", new int []                { 0, 2, 4, 6, 8, 10 }),
@@ -64,41 +109,14 @@ public enum Scale
     /** The Whole-half scale. */
     WHOLE_HALF("Whole-half Dim.", new int []           { 0, 2, 3, 5, 6, 8, 9, 11 }),
 
-    /** The Minor Blues scale. */
-    MINOR_BLUES("Minor Blues", new int []              { 0, 3, 5, 6, 7, 10 }),
-
     /** The Minor Pentatonic scale. */
     MINOR_PENTATONIC("Minor Pentatonic", new int []    { 0, 3, 5, 7, 10 }),
 
     /** The Major Pentatonic scale. */
     MAJOR_PENTATONIC("Major Pentatonic", new int []    { 0, 2, 4, 7, 9 }),
 
-    /** The Dorian #4 scale. */
-    DORIAN_NR_4("Dorian #4", new int []                { 0, 2, 3, 6, 7, 9, 10 }),
-
-    /** The Phrygian Dominant scale. */
-    PHRYGIAN_DOMINANT("Phrygian Dominant", new int []  { 0, 1, 4, 5, 7, 8, 10 }),
-
-    /** The Lydian Augmented scale. */
-    LYDIAN_AUGMENTED("Lydian Augmented", new int []    { 0, 2, 4, 6, 8, 9, 11 }),
-
-    /** The Lydian Dominant scale. */
-    LYDIAN_DOMINANT("Lydian Dominant", new int []      { 0, 2, 4, 6, 7, 9, 10 }),
-
-    /** The Super Locrian scale. */
-    SUPER_LOCRIAN("Super Locrian", new int []          { 0, 1, 3, 4, 6, 8, 10 }),
-
-    /** The Spanish scale. */
-    SPANISH("Spanish", new int []                      { 0, 1, 4, 5, 7, 9, 10 }),
-
     /** The 8-Tone Spanish scale. */
     TONE8_SPANISH("8-Tone Spanish", new int []         { 0, 1, 3, 4, 5, 6, 8, 10 }),
-
-    /** The Bhairav scale. */
-    BHAIRAV("Bhairav", new int []                      { 0, 1, 4, 5, 7, 8, 11 }),
-
-    /** The Hungarian Minor scale. */
-    HUNGARIAN_MINOR("Hungarian Minor", new int []      { 0, 2, 3, 6, 7, 8, 11 }),
 
     /** The Hirojoshi scale. */
     HIROJOSHI("Hirojoshi", new int []                  { 0, 2, 3, 7, 8 }),
