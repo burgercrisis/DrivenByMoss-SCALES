@@ -82,11 +82,11 @@ public class PlayView extends AbstractPlayView<APCminiControlSurface, APCminiCon
                 break;
             case SCENE4:
                 this.scales.prevScale ();
-                this.surface.getDisplay ().notify (this.scales.getScale ().getName ());
+                this.surface.getDisplay ().notify (this.scales.getCurrentScaleName ());
                 break;
             case SCENE5:
                 this.scales.nextScale ();
-                this.surface.getDisplay ().notify (this.scales.getScale ().getName ());
+                this.surface.getDisplay ().notify (this.scales.getCurrentScaleName ());
                 break;
             case SCENE6:
                 this.scales.toggleChromatic ();

@@ -36,6 +36,8 @@ import de.mossgrabers.framework.featuregroup.IView;
 import de.mossgrabers.framework.featuregroup.ModeManager;
 import de.mossgrabers.framework.featuregroup.ViewManager;
 import de.mossgrabers.framework.mode.Modes;
+import de.mossgrabers.framework.scale.CustomScale;
+import de.mossgrabers.framework.scale.CustomScaleLibrary;
 import de.mossgrabers.framework.scale.Scales;
 import de.mossgrabers.framework.utils.ButtonEvent;
 import de.mossgrabers.framework.utils.ConsoleLogger;
@@ -330,6 +332,11 @@ public abstract class AbstractControllerSetup<S extends IControlSurface<C>, C ex
     protected void createScales ()
     {
         this.scales = new Scales (this.valueChanger, 36, 100, 8, 8);
+
+        final CustomScaleLibrary library = new CustomScaleLibrary (CustomScaleLibrary.getDefaultFile ());
+        final List<CustomScale> customScales = library.loadAll ();
+        if (!customScales.isEmpty ())
+            this.scales.setCustomScales (customScales);
     }
 
 

@@ -238,6 +238,26 @@
     - Treat it as "no custom scales loaded" for this session.
     - Surface a clear error or warning in the Bitwig custom scales panel so the user can fix or replace the file manually.
 
+### 7.5 Location of the Custom Scales panel
+
+- **Decision (locked)**
+  - Expose the **Custom Scales** panel in the **global controller settings** for the extension (i.e., use `globalSettings` when calling `activateCustomScalesSettings(...)`), not per-project `documentSettings`.
+  - Rationale: custom scales are explicitly **global to the extension** (and stored in a single `custom-scales.json` file), and sharing them across projects is desired behavior.
+
+### 7.6 Runtime update behavior
+
+- **Decision (locked)**
+  - For v1, **require a controller script reload / Bitwig restart** for changes made in the Custom Scales panel to take full effect in all `Scales` instances.
+  - The panel writes to `custom-scales.json` immediately (with validation), but live re-injection of updated scales into already-running `Scales` objects is **out of scope for the initial implementation**.
+  - A later phase may introduce a cross-layer notification to refresh `Scales` at runtime if this proves important in practice.
+
+### 7.7 Initial rollout target
+
+- **Decision (locked)**
+  - The first concrete user of the Custom Scales panel is **PushConfiguration**:
+    - Call `activateCustomScalesSettings(globalSettings)` from `PushConfiguration.init(...)`.
+  - Once the UX and behavior are validated on Push, the same pattern can be rolled out to other scale-aware configurations (Maschine, Fire, APC/APCmini, Launchpad, etc.).
+
 ---
 
 ## 8. Immediate Next Steps

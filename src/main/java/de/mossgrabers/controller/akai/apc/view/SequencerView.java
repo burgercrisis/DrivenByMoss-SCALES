@@ -160,7 +160,7 @@ public class SequencerView extends AbstractNoteSequencerView<APCControlSurface, 
 
     private void notifyScale ()
     {
-        final String name = this.scales.getScale ().getName ();
+        final String name = this.scales.getCurrentScaleName ();
         this.surface.getConfiguration ().setScale (name);
         this.surface.getDisplay ().notify (name);
     }

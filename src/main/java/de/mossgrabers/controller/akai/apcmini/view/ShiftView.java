@@ -264,15 +264,11 @@ public class ShiftView extends AbstractShiftView<APCminiControlSurface, APCminiC
             // Change the scale
             case 35:
                 this.scales.prevScale ();
-                final String prevScale = this.scales.getScale ().getName ();
-                configuration.setScale (prevScale);
-                display.notify (prevScale);
+                display.notify (this.scales.getCurrentScaleName ());
                 break;
             case 36:
                 this.scales.nextScale ();
-                final String nextScale = this.scales.getScale ().getName ();
-                configuration.setScale (nextScale);
-                display.notify (nextScale);
+                display.notify (this.scales.getCurrentScaleName ());
                 break;
             case 27:
                 final boolean isChromatic = !configuration.isScaleInKey ();

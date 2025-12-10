@@ -462,6 +462,8 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
     private IColorSetting         colorSoloSetting;
     private IColorSetting         colorMuteSetting;
     private IEnumSetting          sessionViewSetting;
+    private IEnumSetting          cursorKeysTrackSetting;
+    private IEnumSetting          cursorKeysSceneSetting;
     private IEnumSetting          perPadPitchbendSetting;
     private IEnumSetting          inTuneLocationSetting;
     private IEnumSetting          inTuneWidthSetting;
@@ -505,6 +507,9 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
         this.activateScaleBaseSetting (documentSettings);
         this.activateScaleInScaleSetting (documentSettings);
         this.activateScaleLayoutSetting (documentSettings);
+
+        // Custom Scales (global to the extension)
+        this.activateCustomScalesSettings (globalSettings);
 
         ///////////////////////////
         // Note Repeat
@@ -1773,15 +1778,35 @@ public class PushConfiguration extends AbstractConfiguration implements IGraphic
      */
     private void activateCursorKeysSettings (final ISettingsUI settingsUI)
     {
-        final IEnumSetting cursorKeysTrackSetting = settingsUI.getEnumSetting ("Cursor Keys Track Option", CATEGORY_WORKFLOW, CURSOR_KEYS_TRACK_OPTIONS, CURSOR_KEYS_TRACK_OPTIONS[0]);
-        cursorKeysTrackSetting.addValueObserver (value -> this.cursorKeysTrackOption = lookupIndex (CURSOR_KEYS_TRACK_OPTIONS, value));
+        this.cursorKeysTrackSetting = settingsUI.getEnumSetting ("Cursor Keys Track Option", CATEGORY_WORKFLOW, CURSOR_KEYS_TRACK_OPTIONS, CURSOR_KEYS_TRACK_OPTIONS[0]);
+        this.cursorKeysTrackSetting.addValueObserver (value -> this.cursorKeysTrackOption = lookupIndex (CURSOR_KEYS_TRACK_OPTIONS, value));
         final IEnumSetting cursorKeysTrackShiftedSetting = settingsUI.getEnumSetting ("Shifted Cursor Keys Track Option", CATEGORY_WORKFLOW, CURSOR_KEYS_TRACK_OPTIONS, CURSOR_KEYS_TRACK_OPTIONS[2]);
         cursorKeysTrackShiftedSetting.addValueObserver (value -> this.cursorKeysTrackShiftedOption = lookupIndex (CURSOR_KEYS_TRACK_OPTIONS, value));
 
-        final IEnumSetting cursorKeysSceneSetting = settingsUI.getEnumSetting ("Cursor Keys Scene Option", CATEGORY_WORKFLOW, CURSOR_KEYS_SCENE_OPTIONS, CURSOR_KEYS_SCENE_OPTIONS[1]);
-        cursorKeysSceneSetting.addValueObserver (value -> this.cursorKeysSceneOption = lookupIndex (CURSOR_KEYS_SCENE_OPTIONS, value));
+        this.cursorKeysSceneSetting = settingsUI.getEnumSetting ("Cursor Keys Scene Option", CATEGORY_WORKFLOW, CURSOR_KEYS_SCENE_OPTIONS, CURSOR_KEYS_SCENE_OPTIONS[1]);
+        this.cursorKeysSceneSetting.addValueObserver (value -> this.cursorKeysSceneOption = lookupIndex (CURSOR_KEYS_SCENE_OPTIONS, value));
         final IEnumSetting cursorKeysSceneShiftedSetting = settingsUI.getEnumSetting ("Shifted Cursor Keys Scene Option", CATEGORY_WORKFLOW, CURSOR_KEYS_SCENE_OPTIONS, CURSOR_KEYS_SCENE_OPTIONS[0]);
         cursorKeysSceneShiftedSetting.addValueObserver (value -> this.cursorKeysSceneShiftedOption = lookupIndex (CURSOR_KEYS_SCENE_OPTIONS, value));
+    }
+
+
+    public void setCursorKeysTrackOption (final int option)
+    {
+        if (this.cursorKeysTrackSetting == null)
+            return;
+        final int max = CURSOR_KEYS_TRACK_OPTIONS.length - 1;
+        final int index = Math.max (0, Math.min (max, option));
+        this.cursorKeysTrackSetting.set (CURSOR_KEYS_TRACK_OPTIONS[index]);
+    }
+
+
+    public void setCursorKeysSceneOption (final int option)
+    {
+        if (this.cursorKeysSceneSetting == null)
+            return;
+        final int max = CURSOR_KEYS_SCENE_OPTIONS.length - 1;
+        final int index = Math.max (0, Math.min (max, option));
+        this.cursorKeysSceneSetting.set (CURSOR_KEYS_SCENE_OPTIONS[index]);
     }
 
 

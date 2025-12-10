@@ -91,7 +91,7 @@ public class RaindropsView extends AbstractRaindropsView<APCControlSurface, APCC
 
     private void notifyScale ()
     {
-        final String name = this.scales.getScale ().getName ();
+        final String name = this.scales.getCurrentScaleName ();
         this.surface.getConfiguration ().setScale (name);
         this.surface.getDisplay ().notify (name);
     }

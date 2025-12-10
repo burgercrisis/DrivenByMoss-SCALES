@@ -197,7 +197,7 @@ public class SequencerView extends AbstractNoteSequencerView<FireControlSurface,
             else
             {
                 this.scales.prevScale ();
-                this.mvHelper.delayDisplay ( () -> this.scales.getScale ().getName ());
+                this.mvHelper.delayDisplay ( () -> this.scales.getCurrentScaleName ());
             }
             this.updateScale ();
         }
@@ -226,7 +226,7 @@ public class SequencerView extends AbstractNoteSequencerView<FireControlSurface,
             else
             {
                 this.scales.nextScale ();
-                this.mvHelper.delayDisplay ( () -> this.scales.getScale ().getName ());
+                this.mvHelper.delayDisplay ( () -> this.scales.getCurrentScaleName ());
             }
             this.updateScale ();
         }

@@ -8,11 +8,11 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 import de.mossgrabers.framework.configuration.Configuration;
 import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.scale.ScaleGrid.Orientation;
-
 
 /**
  * Helper class for applying scales to a row x column pad grid. There are different layouts
@@ -99,6 +99,8 @@ public class Scales
     public static final int             DRUM_OCTAVE_LOWER        = -2;
 
     private Scale                       selectedScale            = Scale.MAJOR;
+    private CustomScale                 selectedCustomScale;
+
     private int                         scaleOffset              = 0;                                                                        // C
     private ScaleLayout                 scaleLayout              = ScaleLayout.FOURTH_UP;
     private Orientation                 orientation              = Orientation.ORIENT_UP;
@@ -121,6 +123,8 @@ public class Scales
 
     private final Map<Scale, ScaleGrid> scaleGrids               = new EnumMap<> (Scale.class);
     private final Map<Scale, ChordGrid> chordGrids               = new EnumMap<> (Scale.class);
+    private List<CustomScale>           customScales             = Collections.emptyList ();
+
     private final IValueChanger         valueChanger;
 
 
@@ -167,6 +171,33 @@ public class Scales
 
 
     /**
+     * Inject the current list of custom scales. The list is copied defensively.
+     *
+     * @param customScales The custom scales to use, or {@code null} for none
+     */
+    public void setCustomScales (final List<CustomScale> customScales)
+    {
+        if (customScales == null || customScales.isEmpty ())
+            this.customScales = Collections.emptyList ();
+        else
+            this.customScales = List.copyOf (customScales);
+    }
+
+
+    /**
+     * Get the name of the currently active scale (custom or built-in).
+     *
+     * @return The active scale name
+     */
+    public String getCurrentScaleName ()
+    {
+        if (this.selectedCustomScale != null && this.selectedCustomScale.getName () != null)
+            return this.selectedCustomScale.getName ();
+        return this.selectedScale.getName ();
+    }
+
+
+    /**
      * Get the currently selected scale.
      *
      * @return The scale
@@ -185,6 +216,7 @@ public class Scales
     public void setScale (final Scale scale)
     {
         this.selectedScale = scale;
+        this.selectedCustomScale = null;
     }
 
 
@@ -195,7 +227,32 @@ public class Scales
      */
     public void setScaleByName (final String scaleName)
     {
-        this.selectedScale = Scale.getByName (scaleName);
+        this.selectedCustomScale = null;
+
+        if (scaleName == null)
+        {
+            this.selectedScale = Scale.MAJOR;
+            return;
+        }
+
+        final Scale builtIn = Scale.getByName (scaleName);
+        if (builtIn != null)
+        {
+            this.selectedScale = builtIn;
+            return;
+        }
+
+        if (this.customScales != null && !this.customScales.isEmpty ())
+        {
+            for (final CustomScale scale: this.customScales)
+            {
+                if (scale != null && scaleName.equals (scale.getName ()))
+                {
+                    this.selectedCustomScale = scale;
+                    return;
+                }
+            }
+        }
     }
 
 
@@ -209,6 +266,7 @@ public class Scales
         final Scale [] values = Scale.values ();
         final int index = this.valueChanger.changeValue (control, this.selectedScale.ordinal (), -100, values.length);
         this.selectedScale = values[index];
+        this.selectedCustomScale = null;
     }
 
 
@@ -241,6 +299,7 @@ public class Scales
     {
         final Scale [] values = Scale.values ();
         this.selectedScale = values[Math.max (0, this.selectedScale.ordinal () - 1)];
+        this.selectedCustomScale = null;
     }
 
 
@@ -251,6 +310,7 @@ public class Scales
     {
         final Scale [] values = Scale.values ();
         this.selectedScale = values[Math.min (values.length - 1, this.selectedScale.ordinal () + 1)];
+        this.selectedCustomScale = null;
     }
 
 
@@ -755,7 +815,8 @@ public class Scales
      */
     public boolean isInScale (final int noteInOctave)
     {
-        for (final int interval: this.selectedScale.getIntervals ())
+        final int [] intervals = this.getActiveIntervals ();
+        for (final int interval: intervals)
         {
             if (interval == noteInOctave)
                 return true;
@@ -776,7 +837,8 @@ public class Scales
 
         int diff = 12;
         int resultNoteInOctave = 0;
-        for (final int interval: this.selectedScale.getIntervals ())
+        final int [] intervals = this.getActiveIntervals ();
+        for (final int interval: intervals)
         {
             final int newDiff = Math.abs (interval - noteInOctave);
             if (Math.abs (interval - noteInOctave) < diff)
@@ -803,7 +865,8 @@ public class Scales
     {
         final int noteInOctave = this.toNoteInOctave (midiNote);
 
-        final int [] intervals = this.selectedScale.getIntervals ();
+        final int [] intervals = this.getActiveIntervals ();
+
         for (int i = 0; i < intervals.length; i++)
         {
             if (intervals[i] == noteInOctave)
@@ -841,7 +904,7 @@ public class Scales
         if (scaleIndex < 0)
             return new int [0];
 
-        final int [] intervals = this.selectedScale.getIntervals ();
+        final int [] intervals = this.getActiveIntervals ();
         final int [] result = new int [addedIntervals.length];
         final int baseOffset = this.startNote + Scales.OFFSETS[this.scaleOffset];
         for (int i = 0; i < addedIntervals.length; i++)
@@ -901,12 +964,20 @@ public class Scales
             return noteMap;
         }
 
-        final int [] intervals = this.selectedScale.getIntervals ();
+        final int [] intervals = this.getActiveIntervals ();
         Arrays.fill (noteMap, -1);
 
         final int noteInOctave = noteOffset % 12;
-        final Scale scale = this.getScale ();
-        int so = scale.getIndexInScale (noteInOctave);
+        int so = 0;
+        for (int i = 0; i < intervals.length; i++)
+        {
+            if (intervals[i] == noteInOctave)
+            {
+                so = i;
+                break;
+            }
+        }
+
         if (so < 0)
             so = 0;
         final int no = noteOffset / 12 * 12;
@@ -1146,6 +1217,23 @@ public class Scales
 
 
     /**
+     * Get the active scale intervals (custom or built-in).
+     *
+     * @return The active semitone intervals array
+     */
+    private int [] getActiveIntervals ()
+    {
+        if (this.selectedCustomScale != null)
+        {
+            final int [] intervals = this.selectedCustomScale.getIntervals ();
+            if (intervals != null && intervals.length > 0)
+                return intervals;
+        }
+        return this.selectedScale.getIntervals ();
+    }
+
+
+    /**
      * Overwrite to hook in translation for grids which do not send MIDI notes 36-100.
      *
      * @param matrix The matrix to translate
@@ -1223,7 +1311,7 @@ public class Scales
      */
     public void updateScaleProperties (final Configuration configuration)
     {
-        final String name = this.getScale ().getName ();
+        final String name = this.getCurrentScaleName ();
         if (!configuration.getScale ().equals (name))
             configuration.setScale (name);
 

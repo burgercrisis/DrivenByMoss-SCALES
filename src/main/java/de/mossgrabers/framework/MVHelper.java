@@ -462,7 +462,7 @@ public class MVHelper<S extends IControlSurface<C>, C extends Configuration>
      */
     public void notifyScale (final Scales scales)
     {
-        this.delayDisplay ( () -> "Scale: " + scales.getScale ().getName ());
+        this.delayDisplay ( () -> "Scale: " + scales.getCurrentScaleName ());
     }
 
 

@@ -147,13 +147,13 @@ public class YaeltexTurnNoteSeqMode extends YaeltexTurnTrackMixMode implements I
                     return;
                 case 14:
                     scales.prevScale ();
-                    final String prevScale = scales.getScale ().getName ();
+                    final String prevScale = scales.getCurrentScaleName ();
                     this.surface.getConfiguration ().setScale (prevScale);
                     display.notify (prevScale);
                     return;
                 case 15:
                     scales.nextScale ();
-                    final String nextScale = scales.getScale ().getName ();
+                    final String nextScale = scales.getCurrentScaleName ();
                     this.surface.getConfiguration ().setScale (nextScale);
                     display.notify (nextScale);
                     return;

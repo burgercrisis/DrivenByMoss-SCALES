@@ -92,7 +92,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
 
             case PLAY, CHORDS:
                 this.scales.prevScale ();
-                final String name = this.scales.getScale ().getName ();
+                final String name = this.scales.getCurrentScaleName ();
                 this.surface.getConfiguration ().setScale (name);
                 this.surface.getDisplay ().notify (name);
                 break;
@@ -185,7 +185,7 @@ public class LaunchpadCursorCommand extends CursorCommand<LaunchpadControlSurfac
 
             case PLAY, CHORDS:
                 this.scales.nextScale ();
-                final String name = this.scales.getScale ().getName ();
+                final String name = this.scales.getCurrentScaleName ();
                 this.surface.getConfiguration ().setScale (name);
                 this.surface.getDisplay ().notify (name);
                 break;

@@ -662,7 +662,20 @@ public class PushControllerSetup extends AbstractControllerSetup<PushControlSurf
         }, ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON);
 
         this.addButton (ButtonID.STOP_CLIP, "Stop Clip", new ClipStopCommand (this.model, surface), PushControlSurface.PUSH_BUTTON_STOP_CLIP, () -> surface.isPressed (ButtonID.STOP_CLIP), PushColorManager.PUSH_BUTTON_STATE_STOP_ON, PushColorManager.PUSH_BUTTON_STATE_STOP_HI);
-        this.addButton (ButtonID.SESSION, "Session", new SelectSessionViewCommand (this.model, surface), PushControlSurface.PUSH_BUTTON_SESSION, () -> Views.isSessionView (viewManager.getActiveID ()));
+
+        final SelectSessionViewCommand selectSessionViewCommand = new SelectSessionViewCommand (this.model, surface);
+        this.addButton (ButtonID.SESSION, "Session", selectSessionViewCommand, PushControlSurface.PUSH_BUTTON_SESSION, () -> {
+
+            if (!Views.isSessionView (viewManager.getActiveID ()))
+                return 0;
+
+            if (this.configuration.isScenesClipViewSelected ())
+                return 2;
+
+            return 1;
+
+        }, ColorManager.BUTTON_STATE_OFF, ColorManager.BUTTON_STATE_ON, ColorManager.BUTTON_STATE_HI);
+
         this.addButton (ButtonID.REPEAT, "Repeat", new FillModeNoteRepeatCommand<> (this.model, surface, true), PushControlSurface.PUSH_BUTTON_REPEAT, this.configuration::isNoteRepeatActive);
         this.addButton (ButtonID.FOOTSWITCH2, "Foot Controller", new FootswitchCommand<> (this.model, surface, 0), PushControlSurface.PUSH_FOOTSWITCH2);
 

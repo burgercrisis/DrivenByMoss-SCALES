@@ -51,7 +51,7 @@ public class ChordsView extends AbstractChordView<MaschineJamControlSurface, Mas
                     this.scales.nextScale ();
                 else
                     this.scales.prevScale ();
-                this.mvHelper.delayDisplay ( () -> "Scale: " + this.scales.getScale ().getName ());
+                this.mvHelper.delayDisplay ( () -> "Scale: " + this.scales.getCurrentScaleName ());
                 break;
 
             case TEMPORARY_NOTES:

@@ -370,12 +370,12 @@ public class PlayView extends AbstractPlayView<MaschineControlSurface, MaschineC
 
             case 12:
                 this.scales.prevScale ();
-                display.notify (this.scales.getScale ().getName ());
+                display.notify (this.scales.getCurrentScaleName ());
                 break;
 
             case 13:
                 this.scales.nextScale ();
-                display.notify (this.scales.getScale ().getName ());
+                display.notify (this.scales.getCurrentScaleName ());
                 break;
 
             case 14:

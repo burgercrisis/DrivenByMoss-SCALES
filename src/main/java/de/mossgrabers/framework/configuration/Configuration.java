@@ -542,6 +542,14 @@ public interface Configuration
 
 
     /**
+     * Set the preferred note view.
+     *
+     * @param view The preferred note view
+     */
+    void setStartupView (Views view);
+
+
+    /**
      * Get the preferred startup mode.
      *
      * @return The preferred startup mode

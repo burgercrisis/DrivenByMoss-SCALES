@@ -52,6 +52,44 @@ public class SelectSessionViewCommand extends AbstractTriggerCommand<PushControl
     {
         final ViewManager viewManager = this.surface.getViewManager ();
 
+        if (event == ButtonEvent.DOWN && this.surface.isShiftPressed ())
+        {
+            final PushConfiguration configuration = this.surface.getConfiguration ();
+
+            int index;
+            if (configuration.isScenesClipViewSelected ())
+                index = 2;
+            else if (configuration.isFlipSession ())
+                index = 1;
+            else
+                index = 0;
+
+            final int newIndex = (index + 1) % 3;
+
+            String label;
+            switch (newIndex)
+            {
+                case 0:
+                    configuration.setFlipSession (false);
+                    label = "SESSION VIEW: Clips";
+                    break;
+
+                case 1:
+                    configuration.setFlipSession (true);
+                    label = "SESSION VIEW: Flipped";
+                    break;
+
+                case 2:
+                default:
+                    configuration.setSceneView ();
+                    label = "SESSION VIEW: Scenes";
+                    break;
+            }
+
+            this.surface.getDisplay ().notify (label);
+            return;
+        }
+
         if (event == ButtonEvent.DOWN)
         {
             this.isTemporary = false;

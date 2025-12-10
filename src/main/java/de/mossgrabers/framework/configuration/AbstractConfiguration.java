@@ -4,6 +4,7 @@
 
 package de.mossgrabers.framework.configuration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,6 +29,8 @@ import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.daw.midi.ArpeggiatorMode;
 import de.mossgrabers.framework.mode.Modes;
 import de.mossgrabers.framework.observer.ISettingObserver;
+import de.mossgrabers.framework.scale.CustomScale;
+import de.mossgrabers.framework.scale.CustomScaleLibrary;
 import de.mossgrabers.framework.scale.Scale;
 import de.mossgrabers.framework.scale.ScaleLayout;
 import de.mossgrabers.framework.scale.Scales;
@@ -153,6 +156,7 @@ public abstract class AbstractConfiguration implements Configuration
 
     protected static final String    CATEGORY_DRUMS                  = "Drum Sequencer";
     protected static final String    CATEGORY_SCALES                 = "Scales";
+    protected static final String    CATEGORY_CUSTOM_SCALES          = "Scales - Custom Scales";
     protected static final String    CATEGORY_SESSION                = "Session";
     protected static final String    CATEGORY_TRANSPORT              = "Transport";
     protected static final String    CATEGORY_WORKFLOW               = "Workflow";
@@ -381,6 +385,7 @@ public abstract class AbstractConfiguration implements Configuration
     private IEnumSetting                              flipSessionSetting;
     private IEnumSetting                              accentActiveSetting;
     private IIntegerSetting                           accentValueSetting;
+    private IEnumSetting                              startupViewSetting;
     private IIntegerSetting                           quantizeAmountSetting;
     private IEnumSetting                              newClipLengthSetting;
     private IEnumSetting                              noteRepeatActiveSetting;
@@ -464,6 +469,12 @@ public abstract class AbstractConfiguration implements Configuration
     private int                                       mpePitchBendRange                   = 48;
     private boolean                                   showPlayedChords                    = true;
     private boolean                                   colorTrackStates                    = true;
+
+    private static final int                          CUSTOM_SCALE_SLOTS                  = 8;
+
+    private List<IStringSetting>                      customScaleNameSettings;
+    private List<IStringSetting>                      customScaleIntervalsSettings;
+    private List<IStringSetting>                      customScaleDescriptionSettings;
 
 
     /**
@@ -966,7 +977,38 @@ public abstract class AbstractConfiguration implements Configuration
      */
     protected void activateScaleSetting (final ISettingsUI settingsUI)
     {
-        this.activateScaleSetting (settingsUI, Scale.getNames (), Scale.MAJOR.getName ());
+        final String [] builtIn = Scale.getNames ();
+
+        String [] customNames = new String [0];
+        try
+        {
+            final CustomScaleLibrary library = new CustomScaleLibrary (CustomScaleLibrary.getDefaultFile ());
+            final List<CustomScale> customScales = library.loadAll ();
+            if (!customScales.isEmpty ())
+            {
+                customNames = new String [customScales.size ()];
+                for (int i = 0; i < customScales.size (); i++)
+                    customNames[i] = customScales.get (i).getName ();
+            }
+        }
+        catch (final Exception ex)
+        {
+            // Ignore and fall back to built-in scales only
+        }
+
+        final String [] scaleNames;
+        if (customNames.length == 0)
+        {
+            scaleNames = builtIn;
+        }
+        else
+        {
+            scaleNames = new String [builtIn.length + customNames.length];
+            System.arraycopy (builtIn, 0, scaleNames, 0, builtIn.length);
+            System.arraycopy (customNames, 0, scaleNames, builtIn.length, customNames.length);
+        }
+
+        this.activateScaleSetting (settingsUI, scaleNames, Scale.MAJOR.getName ());
     }
 
 
@@ -1054,6 +1096,61 @@ public abstract class AbstractConfiguration implements Configuration
         });
 
         this.isSettingActive.add (SCALES_LAYOUT);
+    }
+
+
+    protected void activateCustomScalesSettings (final ISettingsUI settingsUI)
+    {
+        this.customScaleNameSettings = new ArrayList<> (CUSTOM_SCALE_SLOTS);
+        this.customScaleIntervalsSettings = new ArrayList<> (CUSTOM_SCALE_SLOTS);
+        this.customScaleDescriptionSettings = new ArrayList<> (CUSTOM_SCALE_SLOTS);
+
+        for (int i = 0; i < CUSTOM_SCALE_SLOTS; i++)
+        {
+            final int slot = i + 1;
+            final IStringSetting nameSetting = settingsUI.getStringSetting ("Custom Scale " + slot + " Name", CATEGORY_CUSTOM_SCALES, 32, "");
+            final IStringSetting intervalsSetting = settingsUI.getStringSetting ("Custom Scale " + slot + " Intervals", CATEGORY_CUSTOM_SCALES, 48, "");
+            final IStringSetting descriptionSetting = settingsUI.getStringSetting ("Custom Scale " + slot + " Description", CATEGORY_CUSTOM_SCALES, 64, "");
+
+            this.customScaleNameSettings.add (nameSetting);
+            this.customScaleIntervalsSettings.add (intervalsSetting);
+            this.customScaleDescriptionSettings.add (descriptionSetting);
+        }
+
+        try
+        {
+            final CustomScaleLibrary library = new CustomScaleLibrary (CustomScaleLibrary.getDefaultFile ());
+            final List<CustomScale> existing = library.loadAll ();
+            for (int i = 0; i < existing.size () && i < CUSTOM_SCALE_SLOTS; i++)
+            {
+                final CustomScale scale = existing.get (i);
+                final String name = scale.getName ();
+                if (name != null)
+                    this.customScaleNameSettings.get (i).set (name);
+                final int [] intervals = scale.getIntervals ();
+                if (intervals != null && intervals.length > 0)
+                    this.customScaleIntervalsSettings.get (i).set (formatIntervals (intervals));
+                final String description = scale.getDescription ();
+                if (description != null)
+                    this.customScaleDescriptionSettings.get (i).set (description);
+            }
+        }
+        catch (final Exception ex)
+        {
+        }
+
+        for (int i = 0; i < CUSTOM_SCALE_SLOTS; i++)
+        {
+            final IStringSetting nameSetting = this.customScaleNameSettings.get (i);
+            final IStringSetting intervalsSetting = this.customScaleIntervalsSettings.get (i);
+            final IStringSetting descriptionSetting = this.customScaleDescriptionSettings.get (i);
+
+            nameSetting.addValueObserver (value -> this.rebuildCustomScalesFromSettings ());
+            intervalsSetting.addValueObserver (value -> this.rebuildCustomScalesFromSettings ());
+            descriptionSetting.addValueObserver (value -> this.rebuildCustomScalesFromSettings ());
+        }
+
+        this.rebuildCustomScalesFromSettings ();
     }
 
 
@@ -1676,6 +1773,130 @@ public abstract class AbstractConfiguration implements Configuration
     }
 
 
+    private void rebuildCustomScalesFromSettings ()
+    {
+        if (this.customScaleNameSettings == null || this.customScaleIntervalsSettings == null || this.customScaleDescriptionSettings == null)
+            return;
+
+        final List<CustomScale> result = new ArrayList<> (CUSTOM_SCALE_SLOTS);
+        final List<String> errors = new ArrayList<> ();
+        final Set<String> names = new HashSet<> ();
+
+        for (int i = 0; i < CUSTOM_SCALE_SLOTS; i++)
+        {
+            final String rawName = this.customScaleNameSettings.get (i).get ();
+            final String rawIntervals = this.customScaleIntervalsSettings.get (i).get ();
+            final String description = this.customScaleDescriptionSettings.get (i).get ();
+
+            final String name = rawName == null ? null : rawName.trim ();
+            final String intervalsText = rawIntervals == null ? null : rawIntervals.trim ();
+
+            if ((name == null || name.isEmpty ()) && (intervalsText == null || intervalsText.isEmpty ()) && (description == null || description.trim ().isEmpty ()))
+                continue;
+
+            final List<String> slotErrors = new ArrayList<> ();
+
+            if (name == null || name.isEmpty ())
+                slotErrors.add ("Name must not be empty.");
+
+            int [] intervals = null;
+            if (intervalsText == null || intervalsText.isEmpty ())
+                slotErrors.add ("Intervals must not be empty.");
+            else
+                intervals = parseIntervals (intervalsText, slotErrors);
+
+            if (name != null && !name.isEmpty ())
+            {
+                if (!names.add (name))
+                    slotErrors.add ("Duplicate scale name: " + name);
+            }
+
+            if (slotErrors.isEmpty () && intervals != null)
+            {
+                final List<String> validationErrors = CustomScale.validate (name, intervals);
+                slotErrors.addAll (validationErrors);
+            }
+
+            if (!slotErrors.isEmpty ())
+            {
+                final String prefix = "Custom Scale " + (i + 1) + ": ";
+                for (final String msg: slotErrors)
+                    errors.add (prefix + msg);
+                continue;
+            }
+
+            final CustomScale scale = new CustomScale ();
+            scale.setId (name);
+            scale.setName (name);
+            scale.setIntervals (intervals);
+            scale.setDescription (description);
+            result.add (scale);
+        }
+
+        if (!errors.isEmpty ())
+        {
+            this.host.showNotification (errors.get (0));
+            return;
+        }
+
+        try
+        {
+            final CustomScaleLibrary library = new CustomScaleLibrary (CustomScaleLibrary.getDefaultFile ());
+            library.saveAll (result);
+        }
+        catch (final IOException ex)
+        {
+            this.host.error ("Error while saving custom scales.", ex);
+            this.host.showNotification ("Custom Scales: " + ex.getMessage ());
+        }
+    }
+
+
+    private static int [] parseIntervals (final String text, final List<String> errors)
+    {
+        final String [] parts = text.split (",");
+        final int [] values = new int[parts.length];
+        int count = 0;
+        for (final String part: parts)
+        {
+            final String trimmed = part.trim ();
+            if (trimmed.isEmpty ())
+                continue;
+            try
+            {
+                values[count++] = Integer.parseInt (trimmed);
+            }
+            catch (final NumberFormatException ex)
+            {
+                errors.add ("Intervals must be comma-separated integers.");
+                return null;
+            }
+        }
+
+        if (count == values.length)
+            return values;
+
+        final int [] result = new int[count];
+        System.arraycopy (values, 0, result, 0, count);
+        return result;
+    }
+
+
+    private static String formatIntervals (final int [] intervals)
+    {
+        if (intervals.length == 0)
+            return "";
+        final StringBuilder sb = new StringBuilder (intervals.length * 3);
+        sb.append (intervals[0]);
+        for (int i = 1; i < intervals.length; i++)
+        {
+            sb.append (",");
+            sb.append (intervals[i]);
+        }
+        return sb.toString ();
+    }
+
+
     /**
      * Activate the preferred startup view setting.
      *
@@ -1688,8 +1909,8 @@ public abstract class AbstractConfiguration implements Configuration
         for (int i = 0; i < views.length; i++)
             labels[i] = Views.getViewName (views[i]);
 
-        final IEnumSetting startupViewSetting = settingsUI.getEnumSetting ("Startup view", CATEGORY_PLAY_AND_SEQUENCE, labels, labels[0]);
-        startupViewSetting.addValueObserver (value -> {
+        this.startupViewSetting = settingsUI.getEnumSetting ("Startup view", CATEGORY_PLAY_AND_SEQUENCE, labels, labels[0]);
+        this.startupViewSetting.addValueObserver (value -> {
             this.startupView = Views.getViewByName (value);
             this.notifyObservers (STARTUP_VIEW);
         });
@@ -1960,6 +2181,21 @@ public abstract class AbstractConfiguration implements Configuration
     public Views getStartupView ()
     {
         return this.startupView;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void setStartupView (final Views view)
+    {
+        if (this.startupViewSetting != null)
+        {
+            this.startupViewSetting.set (Views.getViewName (view));
+            return;
+        }
+
+        this.startupView = view;
+        this.notifyObservers (STARTUP_VIEW);
     }
 
 

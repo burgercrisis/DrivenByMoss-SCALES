@@ -63,7 +63,7 @@ public class PlayConfigurationMode extends BaseMode
                 else
                     scales.prevScale ();
                 if (!this.surface.getMaschine ().hasMCUDisplay ())
-                    this.surface.getDisplay ().notify (scales.getScale ().getName ());
+                    this.surface.getDisplay ().notify (scales.getCurrentScaleName ());
                 break;
 
             case 3:
@@ -127,7 +127,7 @@ public class PlayConfigurationMode extends BaseMode
                 case 2:
                     scales.setScale (Scale.MAJOR);
                     if (!this.surface.getMaschine ().hasMCUDisplay ())
-                        this.surface.getDisplay ().notify (scales.getScale ().getName ());
+                        this.surface.getDisplay ().notify (scales.getCurrentScaleName ());
                     break;
 
                 case 3:
@@ -165,7 +165,7 @@ public class PlayConfigurationMode extends BaseMode
 
         final Scales scales = this.model.getScales ();
 
-        d.setBlock (0, 0, this.mark ("Scale", 0)).setBlock (1, 0, scales.getScale ().getName ());
+        d.setBlock (0, 0, this.mark ("Scale", 0)).setBlock (1, 0, scales.getCurrentScaleName ());
         d.setCell (0, 3, this.mark ("Base", 3)).setCell (1, 3, Scales.BASES.get (scales.getScaleOffsetIndex ()));
         d.setBlock (0, 2, this.mark ("Layout", 4)).setBlock (1, 2, StringUtils.optimizeName (scales.getScaleLayout ().getName (), 12));
         d.setCell (0, 6, this.mark ("In-Key", 6)).setCell (1, 6, scales.isChromatic () ? "Off" : "On");
@@ -207,7 +207,7 @@ public class PlayConfigurationMode extends BaseMode
         this.surface.getViewManager ().get (Views.PLAY).updateNoteMapping ();
         final MaschineConfiguration config = this.surface.getConfiguration ();
         final Scales scales = this.model.getScales ();
-        config.setScale (scales.getScale ().getName ());
+        config.setScale (scales.getCurrentScaleName ());
         config.setScaleBase (Scales.BASES.get (scales.getScaleOffsetIndex ()));
         config.setScaleLayout (scales.getScaleLayout ().getName ());
     }

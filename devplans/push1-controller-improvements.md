@@ -289,6 +289,12 @@
     - Add temporary debug logging for page switches and key setting changes to help with early testing.
     - Define a simple manual test script covering entry/exit, SCENE tabbing, knob changes, and reset gestures.
 
+  - **Status (Dec 2025)**
+    - Steps 1–3 and 5 are implemented in code for Push 1:
+      - Page model and SCENE guards, Noob and Pro pages (including Info page), and distinct Noob/Pro layouts with a pad response meter.
+    - Step 4 is implemented for pad threshold/curve: `Delete + knob touch` on knobs 1–3 in `ConfigurationMode` resets pad feel/threshold/curve to defaults.
+    - Step 6 is partially covered via a written manual test script; on-device testing and any optional logging remain to be done.
+
 - **Risks & mitigations (Phase 1)**
   - **Risk – Breaking existing SCENE button workflows**
     - Mitigation: centralise the configuration-mode check into a small helper that views call before handling SCENE buttons; add regression tests for Session/Play/Drum views.
@@ -305,6 +311,11 @@
   - `SHIFT + Session` as the hardware shortcut for cycling `SESSION_VIEW_OPTIONS` (Clips/Flipped/Scenes).
   - Clear state indication for Clips vs Scenes mode on Push 1 (text + LED where possible).
   - Exposed cursor behaviour options on-device, tied into existing `cursorKeys*` configuration.
+
+  - **Status (Dec 2025)**
+    - `SHIFT + Session` cycling of `SESSION_VIEW_OPTIONS` with a short banner on the Push 1 display is implemented in `SelectSessionViewCommand`.
+    - The Session button LED now encodes Clips vs Scenes on Push controllers (off when no session view is active, dim for Clips/Flipped, bright for Scenes) via `PushControllerSetup`.
+    - Track/scene cursor behaviour options are exposed on-device on the Pro page of `ConfigurationMode`, driving the existing `cursorKeysTrackOption` / `cursorKeysSceneOption` settings.
 
 ### Phase 3 – Pad behaviour UX & ribbon improvements
 

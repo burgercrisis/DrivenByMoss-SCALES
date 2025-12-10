@@ -69,7 +69,7 @@ public class PlayView extends AbstractPlayView<BeatstepControlSurface, BeatstepC
                     this.scales.nextScale ();
                 else
                     this.scales.prevScale ();
-                final String scale = this.scales.getScale ().getName ();
+                final String scale = this.scales.getCurrentScaleName ();
                 this.surface.getConfiguration ().setScale (scale);
                 this.surface.getDisplay ().notify (scale);
                 break;

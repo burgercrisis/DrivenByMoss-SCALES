@@ -67,13 +67,13 @@ public class PlayView extends AbstractPlayView<APCControlSurface, APCConfigurati
             case SCENE1:
                 this.scales.nextScale ();
                 this.updateScale ();
-                this.surface.getDisplay ().notify ("Scale: " + this.scales.getScale ().getName ());
+                this.surface.getDisplay ().notify ("Scale: " + this.scales.getCurrentScaleName ());
                 break;
 
             case SCENE2:
                 this.scales.prevScale ();
                 this.updateScale ();
-                this.surface.getDisplay ().notify ("Scale: " + this.scales.getScale ().getName ());
+                this.surface.getDisplay ().notify ("Scale: " + this.scales.getCurrentScaleName ());
                 break;
 
             case SCENE3:
