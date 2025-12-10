@@ -5,6 +5,7 @@
 - [Bitwig Custom Scales Panel](#bitwig-custom-scales-panel)
 - [Push 1 Controller Improvements](#push-1-controller-improvements)
 - [Scale Control via Script Parameters](#scale-control-via-script-parameters)
+ - [Sequencer Modes & Note/Play Selector](#sequencer-modes--noteplay-selector)
 
 ## Bitwig Custom Scales Panel
 ### Current State
@@ -228,6 +229,30 @@
 - **Potential future extensions**
   - Consider adding more expression-related settings to the Pro page if needed (e.g. additional accent / aftertouch options).
   - Evaluate whether any of the existing Pro settings should also be surfaced, in simplified form, on the Noob page based on user feedback.
+
+## Sequencer Modes & Note/Play Selector
+
+### Current State
+
+- **Design context**
+  - Detailed specs for a new **ratchet/polymeter note sequencer** on Push 1 live in `devplans/push1-sequencer-mode.md`.
+  - A complementary **parameter sequencer mode** (automation layer) is defined in `devplans/push-parameter-sequencer-mode.md`.
+  - Both modes share a **SHIFT-banked Note/Play selector** via `NoteViewSelectMode`:
+    - **Primary bank (SHIFT up)** keeps the existing NoteViewSelect views (Play, Chords, Piano, Drum64, Poly Sequencer, Raindrops, Drum variants, Clip Length, Program Change, etc.).
+    - **Advanced bank (SHIFT down)** is reserved exclusively for new SCALES-specific modes, with a v1 layout of:
+      - Column 1 / top row: ratchet/polymeter sequencer (`Views.RATCHET_SEQ`).
+      - Column 2 / top row: Parameter Sequencer lane-focus view (`Views.PARAM_SEQ`).
+      - Column 3 / top row: Parameter Overview view (`Views.PARAM_OVERVIEW`).
+      - Columns 4–8: reserved for future tools.
+
+- **Status (Dec 2025)**
+  - **Planning**
+    - Devplans for the Push 1 ratchet/polymeter sequencer and the parameter sequencer are written, internally consistent, and aligned on the shared Note/Play selector model.
+    - Advanced-bank layout for `NoteViewSelectMode` is defined at a high level as above; devplans treat this as the v1 target.
+  - **Implementation**
+    - No new sequencer modes are registered or wired in `PushControllerSetup` yet (no `Modes`/`Views` entries for `Views.RATCHET_SEQ`, `Views.PARAM_SEQ`, or `Views.PARAM_OVERVIEW`).
+    - `NoteViewSelectMode` has not yet been modified to support primary vs advanced banks based on `surface.isShiftPressed()`.
+  - This section centralizes sequencer status; `push1-sequencer-mode.md` and `push-parameter-sequencer-mode.md` are treated as **spec documents only**.
 
 ## Scale Control via Script Parameters
 

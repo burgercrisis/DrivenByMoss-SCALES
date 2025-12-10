@@ -1,0 +1,250 @@
+# Push 1 – Grid-Based Sequencer From Bitwig Grid Preset (Speculative Dev Plan)
+
+## 1. Goal & Scope
+
+- **Goal**
+  - Use a Bitwig Grid device preset of a sequencer as the **reference implementation** for a new sequencer workflow on Push 1.
+  - Implement a **Push 1 sequencer mode** (or extension of an existing mode) that reproduces the *musical behaviour* of the Grid patch, not its exact module graph.
+
+- **Scope (initial)**
+  - Input: one or more Bitwig Grid sequencer presets exported as `.bwpreset` / `.bwgrid` files and checked into this repo.
+  - Analysis: infer the **sequencing algorithm**:
+    - Step advance logic (clock, direction, length, reset rules).
+    - Gate/trig generation rules.
+    - Pitch / modulation logic (e.g. scale-constrained random pitch, Euclidean distribution, probability per step).
+  - Implementation: Push 1–focused sequencer:
+    - Data model + engine implemented in Java (within the existing controller framework).
+    - A Push 1 mode that exposes the core controls via pads, encoders, and the text display.
+
+- **Out of scope (for now)**
+  - Audio-rate DSP or per-sample modulation from the Grid patch (we only care about musical/step logic).
+  - A generic Grid-preset loader; this is a **hand-translated** design, not an automatic converter.
+  - Major refactors of the sequencer infrastructure across all controllers (keep this scoped to Push 1 + shared utilities where obvious).
+
+---
+
+## 2. Inputs & Required Artifacts
+
+- **Bitwig Grid preset(s)**
+  - At least one sequencer-oriented Grid preset exported from Bitwig and committed to this repo.
+  - Suggested location (to be confirmed):
+    - `resources/BitwigGrid/Sequencers/<name>.bwpreset`
+    - or `devplans/grid-sequencer-prototypes/<name>.bwpreset`
+
+- **Preset characteristics (to be documented by hand)**
+  - Short textual description for each preset:
+    - What musical behaviour it implements (e.g. Euclidean gates, probability-per-step, random octave jumps, etc.).
+    - Whether it is primarily **note-generating**, **modulation-generating**, or **hybrid**.
+    - Any non-obvious gestures (e.g. “mod wheel increases density”, “velocity controls probability”).
+
+- **Fallback description if preset is opaque**
+  - If the `.bwpreset` turns out to be partially/fully binary, capture at least:
+    - Module list (names, roles),
+    - Connection overview (clock → steps → logic → outputs),
+    - Key parameters and their ranges.
+  - This can be done once in a text sketch or annotated screenshot description.
+
+---
+
+## 3. Analysis Approach – From Grid Patch to Sequencer Algorithm
+
+- **Step 1 – Inspect the preset file(s)**
+  - Open the preset file as text from the repo.
+  - Determine representation:
+    - JSON/XML-like (ideal: readable structure with modules and connections), or
+    - Binary container (limited direct introspection).
+
+- **Step 2 – Extract a conceptual graph**
+  - Identify major functional blocks:
+    - **Clocking** – how tempo/transport/clock is generated or received.
+    - **Step engine** – number of steps, indexing scheme, direction (forward, ping-pong, random), length.
+    - **Gate logic** – conditions that decide when a step fires.
+    - **Pitch/modulation logic** – how note values or modulation values are computed.
+    - **Randomness / probability** – which decisions are randomised and how (per-step probability, random skip, random length, etc.).
+    - **Performance controls** – external modulators mapped to high-level musical behaviours (density, swing, variation, etc.).
+
+- **Step 3 – Decide what to reproduce exactly vs approximately**
+  - **Exact reproduction** where it’s simple and musically critical:
+    - Step length, number of steps, direction behaviour.
+    - Deterministic transforms (e.g. fixed transposition patterns).
+  - **Approximate reproduction** where Grid-specific details are heavy but musical intent is clear:
+    - Replace deep modulation trees with **1–2 intuitive controls** on Push (e.g. one knob for “density” instead of 4 internal modulators).
+    - Collapse multiple similar branches into a simpler parameter.
+
+- **Step 4 – Derive a Push-friendly parameter set**
+  - Create a minimal set of parameters that captures the patch’s essence, e.g.:
+    - Number of steps.
+    - Direction (Forward / Backward / Pendulum / Random).
+    - Gate probability per step or global probability.
+    - Pitch source (static per-step vs random in scale vs pattern).
+    - Density / sparsity control.
+    - Variation depth (how wild the randomisation is).
+  - These parameters will become:
+    - Fields in the sequencer engine.
+    - Knob assignments and/or pad gestures in the Push 1 mode.
+
+---
+
+## 4. Push 1 Integration – Design Options
+
+### 4.1 What kind of sequencer?
+
+- **Open decision – Sequencer type**
+  - **Option A – Note sequencer (recommended as v1 default)**
+    - Steps emit MIDI notes, aligned with existing `Scales` logic and Push’s pad layout.
+  - **Option B – Modulation sequencer**
+    - Steps emit CC or parameter values (e.g. to drive device parameters via remote controls).
+  - **Option C – Hybrid**
+    - Combined note + modulation lanes; more powerful but significantly more UI complexity.
+
+- **(Recommendation)** Start with **Option A – Note sequencer**, with the possibility of adding a modulation lane later using the same engine.
+
+### 4.2 Where does it live in the Push 1 UI?
+
+- **Option 1 – New dedicated mode**
+  - Add a `GridSequencerMode` (name TBD) alongside existing performance modes.
+  - Pros:
+    - Clear mental model: “this is the Grid-style sequencer mode”.
+    - Easier to evolve independently.
+  - Cons:
+    - Costs a mode slot and a gesture (button combination) to enter it.
+
+- **Option 2 – Extension of an existing step/seq mode**
+  - Extend an existing sequencer-like mode (if present) with an additional “Grid” page.
+  - Pros:
+    - Reuses mode infrastructure and some UI patterns.
+  - Cons:
+    - Risks overloading an existing mode and making it harder to learn.
+
+- **(Recommendation)** Prefer a **dedicated new mode** for the Grid-derived sequencer, at least for early iterations.
+
+### 4.3 Mapping to pads, encoders, and display
+
+- **Pads (8×8)**
+  - Likely primary role: **steps**.
+  - Example mapping:
+    - Y-axis: lanes (if any) or velocity levels.
+    - X-axis: step index (1–8 per page, with paging for longer sequences).
+    - Pad color/brightness: gate on/off, probability strength, accent, or step type.
+
+- **Encoders (top row)**
+  - Per-page or global parameters derived from the Grid patch, e.g.:
+    - Steps / Length / Direction.
+    - Global probability or density.
+    - Variation depth.
+    - Root note / octave / scale integration (if not solely delegated to existing `Scales` UX).
+
+- **Display (Push 1 text display)**
+  - Show a compact summary on the top line (e.g. `GRID SEQ | 16ST FWD P:75% VAR:2`).
+  - Use a row for:
+    - Cursor position (step/page).
+    - Current mode (Note vs Modulation, if hybrid).
+    - Key parameter values with short labels.
+
+### 4.4 Interaction with existing scales / layouts
+
+- The sequencer should respect existing **scale and layout** decisions where possible:
+  - Use the same scale/root as the active `ScalesMode` configuration.
+  - Offer a small per-sequencer transposition or offset control, but avoid duplicating all scale configuration.
+
+---
+
+## 5. Implementation Phases
+
+### Phase 0 – Preset collection & analysis
+
+- **Deliverables**
+  - One or more candidate Grid sequencer presets committed under a known path.
+  - A short written description for each preset summarising behaviour and priorities.
+  - A conceptual diagram / notes of the module graph and parameter mapping.
+
+- **Tasks**
+  - Export the chosen Grid sequencer preset(s) from Bitwig.
+  - Place them in the repo (`resources/BitwigGrid/Sequencers/` or similar) and record exact paths here.
+  - Inspect the file representation and extract the functional blocks listed in Section 3.
+
+### Phase 1 – Sequencer engine & data model
+
+- **Deliverables**
+  - A new **sequencer engine class** (or small group of classes) that:
+    - Implements a tempo-synced step engine with a configurable number of steps, direction, and reset rules.
+    - Supports gate probability and basic variation logic as derived from the Grid patch.
+    - Produces note events (and optionally, in the future, modulation values).
+
+- **Tasks**
+  - Define data structures for:
+    - Step state (on/off, probability, pitch offset, accent, etc.).
+    - Sequence state (current step index, direction, page).
+  - Implement clock-handling hooks compatible with the existing controller framework.
+  - Wire basic transport sync (start/stop) and tempo awareness.
+
+### Phase 2 – Push 1 mode & UI
+
+- **Deliverables**
+  - A new Push 1 mode exposing the engine via pads, encoders, and the text display.
+  - Clear, stable mappings between hardware controls and sequencer parameters.
+
+- **Tasks**
+  - Register the mode in `PushControllerSetup` for `PushVersion.VERSION_1`.
+  - Implement pad handling:
+    - Toggle steps, adjust probability/velocity/accent via velocity or Shift gestures.
+  - Implement encoder mapping for global parameters (length, direction, density, variation, transpose, etc.).
+  - Implement a text-display layout consistent with other Push 1 modes.
+
+### Phase 3 – Configuration & scale integration
+
+- **Deliverables**
+  - Integration with existing `Scales` / layout configuration.
+  - Optional simple configuration hooks for the sequencer (e.g. default length, default direction).
+
+- **Tasks**
+  - Ensure note output is correctly mapped into the current scale/layout.
+  - Add minimal configuration entries (if needed) via `PushConfiguration`.
+  - Decide whether sequencer settings are **per-project**, **per-track**, or **global** (see Open Decisions).
+
+### Phase 4 – Testing & refinement
+
+- **Deliverables**
+  - Manual test checklist to validate behaviour against the Grid reference patch.
+  - Iterative refinement of parameter ranges and interaction to feel musical on Push 1.
+
+- **Tasks**
+  - Compare resulting sequences (rhythmically and melodically) to the Grid patch by ear and by observation.
+  - Adjust mapping and parameter scaling where needed to close the gap.
+
+---
+
+## 6. Open Decisions
+
+- **OD1 – Exact reference preset(s)**
+  - Which specific Grid sequencer is used as the primary reference?
+  - Are there multiple presets covering different use cases (e.g. Euclidean vs random-walk vs traditional step seq)?
+
+- **OD2 – Sequence ownership / scope**
+  - Is the sequencer attached to:
+    - A **single track** (track-local state),
+    - A **global engine** that can target multiple tracks, or
+    - A **per-device** concept mapped to the currently selected device?
+
+- **OD3 – Polyphony model**
+  - Monophonic (one note per tick) vs simple polyphony (chord per step) vs multi-lane.
+
+- **OD4 – Modulation lane(s)**
+  - Whether to introduce modulation lanes in v1 or defer to a later iteration.
+
+- **OD5 – Persistence & recall**
+  - How sequencer state is persisted:
+    - As part of Bitwig’s controller settings,
+    - As script parameters bound to the project,
+    - Or minimal persistence with reliance on the host side.
+
+---
+
+## 7. Immediate Next Steps
+
+1. Choose 1–2 Grid sequencer presets that best represent the behaviour you want on Push 1.
+2. Export those presets from Bitwig and add them to this repo under a stable path (e.g. `resources/BitwigGrid/Sequencers/`).
+3. Add a short textual description next to each preset (either in this file or an adjacent README) covering behaviour and priorities.
+4. Once presets are in place, perform a first-pass analysis (Section 3) and sketch the concrete Push 1 parameter set and UI mapping based on what you actually use in the patch.
+5. Decide on the initial sequencer type (note vs modulation vs hybrid) and where the mode will live in the Push 1 mode layout.
+6. From there, start a small implementation spike for Phase 1 + Phase 2 with a minimal, testable subset (e.g. 8-step forward-only note sequencer with global probability) before layering in the more advanced behaviour from the Grid patch.

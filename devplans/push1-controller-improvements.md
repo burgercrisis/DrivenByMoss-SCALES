@@ -249,6 +249,24 @@
     - Current pad threshold/curve settings when switched or when entering `ConfigurationMode`.
   - This helps diagnose support issues for Push 1 users without requiring manual reproduction.
 
+### 3.7 Sequencer modes & Note/Play selector (status only)
+
+- **Design context**
+  - Detailed specs for a new **ratchet/polymeter note sequencer** on Push 1 live in `devplans/push1-sequencer-mode.md`.
+  - A complementary **parameter sequencer mode** (automation layer) is defined in `devplans/push-parameter-sequencer-mode.md`.
+  - Both modes share a **SHIFT-banked Note/Play selector** on Push 1 via `NoteViewSelectMode`:
+    - Primary bank (SHIFT up) keeps the existing NoteViewSelect views.
+    - Advanced bank (SHIFT down) is reserved exclusively for new SCALES-specific modes such as `Views.RATCHET_SEQ`, `Views.PARAM_SEQ`, and `Views.PARAM_OVERVIEW`.
+
+- **Status (Dec 2025)**
+  - **Planning**
+    - Devplans for the Push 1 ratchet/polymeter sequencer and the parameter sequencer are written and internally consistent.
+    - Advanced-bank layout for `NoteViewSelectMode` is defined at a high level (column 1: ratchet/polymeter sequencer, column 2: parameter sequencer lane view, column 3: parameter overview; columns 4–8 reserved).
+  - **Implementation**
+    - No new sequencer modes are registered or wired in `PushControllerSetup` yet (no `Modes`/`Views` entries for `Views.RATCHET_SEQ`, `Views.PARAM_SEQ`, or `Views.PARAM_OVERVIEW`).
+    - `NoteViewSelectMode` has not yet been modified to support primary vs advanced banks based on SHIFT state.
+  - This section centralises sequencer status; individual sequencer devplans are treated as **spec documents only**, without their own implementation status bullets.
+
 ---
 
 ## 4. Possible Implementation Phases

@@ -344,11 +344,32 @@
   - Implementation sketch (to guide code):
     - Extend `NoteViewSelectMode` to check `surface.isShiftPressed()` when drawing and when handling button events.
     - Define two logical banks (e.g. `VIEWS_PRIMARY`, `VIEWS_ADVANCED`) rather than a single `VIEWS`/`VIEWS_TOP` pair.
-    - Map the **advanced bank** to include `Views.SEQUENCER` (the new mode), `Views.POLY_SEQUENCER`, and other deep tools; keep classic Play/Drum views in the primary bank.
+    - Map the **advanced bank** to include the new SCALES-specific modes only (e.g. `Views.RATCHET_SEQ`, `Views.PARAM_SEQ`, `Views.PARAM_OVERVIEW`); keep the original `Views.SEQUENCER`, `Views.POLY_SEQUENCER`, `Views.RAINDROPS`, Drum variants, etc. in the primary bank.
     - Ensure the Push 1 display clearly labels rows/columns so users understand when they are in the advanced bank.
   - Rationale:
     - Matches the mental model "hold SHIFT while in the play mode selector to see a second set of choices".
     - Keeps advanced modes visually and mentally separated from everyday play modes while reusing the existing Note view selection infrastructure.
+
+- **Advanced-bank indicator (minimal)**
+  - v1 relies on the **different set of entries and labels** in the advanced bank (vs. primary) to indicate that SHIFT is held.
+  - No dedicated "ADVANCED" banner or explicit mode label is planned; any additional hints should be subtle and must not change the primary/advanced bank mapping.
+
+- **Bank composition (primary vs advanced)**
+  - **Primary bank (SHIFT up)** keeps the existing `NoteViewSelectMode` mapping for all **original** play views (Play, Chords, Piano, Drum64, Poly Sequencer, Raindrops, Drum variants, Clip Length, Program Change). No new SCALES-specific modes are added to the primary bank.
+  - **Advanced bank (SHIFT down)** is reserved **exclusively for new SCALES-specific additions**:
+    - The new ratchet/polymeter **Note Sequencer** defined in this devplan.
+    - The **Parameter Sequencer** lane-focus view and its **Parameter Overview** from the parameter sequencer devplan.
+    - Any future advanced sequencer / performance tools you add.
+  - **Rule (locked)**: *all original views remain in the primary bank; all new additions from these SCALES devplans live only in the advanced bank*.
+
+  - **Advanced-bank layout (v1 target)**
+
+    | Column | Top (Sequence row)        | Bottom (Play/Tools row) | Backing view ID (conceptual) |
+    |--------|---------------------------|--------------------------|------------------------------|
+    | 1      | Ratchet/Poly Seq          | —                        | `Views.RATCHET_SEQ`          |
+    | 2      | Param Seq (Lane)          | —                        | `Views.PARAM_SEQ`            |
+    | 3      | Param Overview            | —                        | `Views.PARAM_OVERVIEW`       |
+    | 4–8    | (Reserved for future)     | —                        | —                            |
 
 - **Alternatives considered (not chosen for v1)**
   - **Option A – Reuse existing NoteViewSelectMode grid with no SHIFT behaviour**
