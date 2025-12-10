@@ -106,7 +106,7 @@
     - A **Pro Page** that surfaces a broader set of performance-related settings for power users.
   - Potential interaction patterns:
     - Use **Scene 1** and **Scene 2** as tabs to switch between the Noob and Pro pages while in `ConfigurationMode` (with Scene 3 optionally reserved for an Info page later).
-    - Guard scene-button handling in the views that normally respond to SCENE buttons (Play, Drum, Chords, etc.) so that, when `Modes.CONFIGURATION` is active, scene presses are consumed by `ConfigurationMode` instead of triggering scene launch/note-repeat behaviour.
+    - Guard scene-button handling in **all** views that normally respond to SCENE buttons (Play, Session, Drum variants, Chords, PrgChange, NoteRepeat helpers, etc.) so that, when `Modes.CONFIGURATION` is active, scene presses are ignored by those views and are instead consumed by `ConfigurationMode` for page switching.
     - Use SHIFT + encoder(s) to jump between groups on a given page if needed.
   - Initial content split (Minimal Noob, deep Pro):
     - **Noob Page (everyday performance setup)**
@@ -120,19 +120,21 @@
       - **Startup View** – a small set like `Play / Drum / Session` for where Push 1 lands on startup.
       - Optional: show the **pad response meter** (Idea 8) as a visual aid while adjusting the above.
     - **Pro Page (power-user tuning & expression)**
-      - **Pad Threshold (full list)** – expose the complete Push 1 threshold table.
-      - **Velocity Curve (full list)** – full list of available curves.
-      - **Velocity Shaping / Compression Mode** (if implemented) – `Off / Soft / Hard / Compressed` as an extra software layer on top of hardware curves.
-      - **Pad Feel Preset (read/write)** – same presets as the Noob page, shown alongside raw values.
-      - **Accent Mode** – e.g. `Button / Velocity / Both` for how accents are triggered.
-      - **Accent Boost Amount** – stepped boost values or fixed velocity targets.
-      - **Note Repeat Accent Behaviour** – e.g. `First Hit Only / All Hits`.
-      - **Aftertouch Target** – e.g. `Off / Filter / Volume / Pitch / Last Touched`.
-      - **Aftertouch Depth** – coarse depth control (e.g. `Low / Medium / High`).
-      - **Track Cursor Behaviour** – `Step / Page / Swap`.
-      - **Scene Cursor Behaviour** – `Step / Page`.
-      - **Ribbon Mode Default** – one of the existing `RIBBON_MODE_*` values (e.g. `Pitch / CC / Fader / Last Touched`).
-      - **Ribbon Note-Repeat Mode Default** – one of `RIBBON_NOTE_REPEAT_VALUES` (`Off / Period / Length`).
+      - **v1 scope (trimmed Pro v1)**
+        - **Pad Threshold (full list)** – expose the complete Push 1 threshold table.
+        - **Velocity Curve (full list)** – full list of available curves.
+        - **Pad Feel Preset (read/write)** – same presets as the Noob page, shown alongside raw values.
+        - **Track Cursor Behaviour** – `Step / Page / Swap`.
+        - **Scene Cursor Behaviour** – `Step / Page`.
+        - **Ribbon Mode Default** – one of the existing `RIBBON_MODE_*` values (e.g. `Pitch / CC / Fader / Last Touched`).
+        - **Ribbon Note-Repeat Mode Default** – one of `RIBBON_NOTE_REPEAT_VALUES` (`Off / Period / Length`).
+      - **Later-phase expression extensions (beyond v1)**
+        - **Velocity Shaping / Compression Mode** – `Off / Soft / Hard / Compressed` as an extra software layer on top of hardware curves.
+        - **Accent Mode** – e.g. `Button / Velocity / Both` for how accents are triggered.
+        - **Accent Boost Amount** – stepped boost values or fixed velocity targets.
+        - **Note Repeat Accent Behaviour** – e.g. `First Hit Only / All Hits`.
+        - **Aftertouch Target** – e.g. `Off / Filter / Volume / Pitch / Last Touched`.
+        - **Aftertouch Depth** – coarse depth control (e.g. `Low / Medium / High`).
 
 - **Idea 2 – Add a Push-1 `Info` sub-view**
   - Push 2 has `InfoMode` with firmware/board/serial.
@@ -265,6 +267,37 @@
   - Optional `Info` sub-page with firmware and hardware info.
   - Consistent `Delete + knob touch` reset behaviour for pad threshold/curve.
   - Minimal updates to `Push1Display` helpers if necessary (e.g. convenience methods for short banners / headings).
+ 
+- **Implementation plan (ordered)**
+  - **Step 1 – Page model and SCENE guards**
+    - Add a simple `page` enum/field to `ConfigurationMode` (`NOOB`, `PRO`, later `INFO`).
+    - Wire `Scene 1` / `Scene 2` button events in `ConfigurationMode` to switch pages while `Modes.CONFIGURATION` is active.
+    - In all views that handle SCENE buttons, add a guard to ignore SCENE presses while `Modes.CONFIGURATION` is active (distributed guard pattern).
+  - **Step 2 – Noob Page: knobs & settings**
+    - Map knobs 1–8 to the Noob Page settings defined in Section 3.1 (pad feel preset, coarse threshold/curve, note repeat defaults, accent, session view, startup view).
+    - For each setting, rely on existing `PushConfiguration` fields where possible; only add new configuration values when no appropriate backing already exists.
+  - **Step 3 – Pro Page v1: knobs & settings**
+    - Implement the trimmed Pro v1 scope: full threshold/curve lists, pad feel preset, track/scene cursor behaviours, ribbon defaults.
+    - Keep page layout stable even if some settings are temporarily stubbed or not yet wired, to avoid churn in the on-device mental model.
+  - **Step 4 – Delete + knob touch resets**
+    - Mirror the `SetupMode` pattern by extending `ConfigurationMode.onKnobTouch` to check `Delete` state and reset only the relevant settings (e.g. pad threshold/curve, pad feel preset) to defaults.
+    - Ensure that reset behaviour is only active while in `ConfigurationMode` to avoid surprises in other modes.
+  - **Step 5 – Display layout & pad response meter**
+    - Update `updateDisplay1` to render distinct layouts for Noob vs Pro pages, matching the row/column design in Section 3.1.
+    - Add an optional pad response meter row that reuses existing bar helpers and a "last hit velocity" value sourced from `PushControlSurface` / `PushPadGrid`.
+  - **Step 6 – Testing & toggles**
+    - Add temporary debug logging for page switches and key setting changes to help with early testing.
+    - Define a simple manual test script covering entry/exit, SCENE tabbing, knob changes, and reset gestures.
+
+- **Risks & mitigations (Phase 1)**
+  - **Risk – Breaking existing SCENE button workflows**
+    - Mitigation: centralise the configuration-mode check into a small helper that views call before handling SCENE buttons; add regression tests for Session/Play/Drum views.
+  - **Risk – Configuration drift between hardware UI and Bitwig settings panels**
+    - Mitigation: always route Noob/Pro page changes through `PushConfiguration` setters so that the on-device UX is a thin layer over the canonical settings.
+  - **Risk – Overloading the text display and making pages hard to parse**
+    - Mitigation: keep labels short, avoid dynamic reflow, and validate layouts on-device early with a minimal spike before filling in all settings.
+  - **Risk – Future extension making the page model brittle**
+    - Mitigation: treat page IDs and knob roles as a small internal "contract" (documented here) and avoid reusing knobs for unrelated concepts within the same page.
 
 ### Phase 2 – Session view & navigation tweaks
 
@@ -315,12 +348,12 @@
 
 - **Design guardrails (Decision – locked)**
   - New gestures should:
-    - Be hard to trigger accidentally (favouring long-press or SHIFT combinations).
+    - Be hard to trigger accidentally (favouring SHIFT combinations or clearly intentional long-presses).
     - Stay consistent with Push 2/3 conventions where possible.
+    - **Prefer SHIFT combos for new gestures**, using long-press only where there is an especially natural hold-based semantic.
 
 - **Questions (still open)**
   - Are users attached to existing SHIFT and mode-button behaviours on Push 1, or is there room for re-mapping within these guardrails?
-  - Given the guardrails above, should new features prefer long-press semantics over new SHIFT combos to avoid accidental activation?
   - **Ribbon**:
     - Keep ribbon mode and ribbon note-repeat behaviour controlled via existing Bitwig settings and current in-app behaviour; no new ribbon gestures are introduced in this plan.
 

@@ -1,9 +1,9 @@
-# Bigwig Custom Scales Panel – Dev Plan
+# Bitwig Custom Scales Panel – Dev Plan
 
 ## 1. Goal & Scope
 
 - **Goal**
-  - Add a panel in the Bitwig ("Bigwig") controller settings for this extension that lets users define and manage *custom musical scales*.
+  - Add a panel in the Bitwig controller settings for this extension that lets users define and manage *custom musical scales*.
   - Custom scales must integrate with the existing `Scales` / configuration system so all supported controllers can use them transparently.
   - Where possible, **scale selection and behavior should be exposed as script parameters / configuration values**, so controllers and automation work by driving these parameters rather than introducing additional MIDI protocols for scale control.
 
@@ -77,7 +77,7 @@
 
 ---
 
-## 4. Bigwig Panel UX
+## 4. Bitwig Panel UX
 
 ### 4.1 Panel location
 
@@ -192,7 +192,7 @@
     - Expose combined list of built‑in + custom scales to configuration and controller modes.
   - Any necessary adaptation so existing modes (Push, Maschine, Oxi One, etc.) work unchanged but can now select custom scales by name.
 
-### Phase 3 – Bigwig panel UI
+### Phase 3 – Bitwig panel UI
 
 - **Deliverables**
   - New `Custom Scales` section in the Bitwig controller settings for this extension.
@@ -236,7 +236,7 @@
   - If the custom scales file is unreadable or contains invalid JSON:
     - Do **not** overwrite, truncate, or auto-fix the file.
     - Treat it as "no custom scales loaded" for this session.
-    - Surface a clear error or warning in the Bigwig custom scales panel so the user can fix or replace the file manually.
+    - Surface a clear error or warning in the Bitwig custom scales panel so the user can fix or replace the file manually.
 
 ---
 
