@@ -337,41 +337,26 @@
   - `NoteViewSelectMode` already exposes a **2×8 grid of play-related views** using `VIEWS` (bottom row) and `VIEWS_TOP` (top row), including `Views.SEQUENCER`, `Views.POLY_SEQUENCER`, `Views.RAINDROPS`, `Views.DRUM` variants, etc.
   - SHIFT is **not currently used** as a modifier for Note/view selection; it is used elsewhere (e.g. Undo/Redo, sends page, stop-clip behaviour).
 
-- **Option A – Reuse existing NoteViewSelectMode grid (no new SHIFT behaviour)**
-  - Keep the current `NOTE → SelectPlayViewCommand → NoteViewSelectMode` flow exactly as is.
-  - Treat the existing `Views.SEQUENCER` slot in `NoteViewSelectMode.VIEWS_TOP` as the **home for the new ratchet/polymeter sequencer** (or repoint one of the `null` slots if needed).
-  - **Pros**
-    - No change to the Note button gesture; users still press `Note` to see a grid of play views.
-    - Leverages existing two-row layout already grouping "Sequence" and "Play" tools.
-    - Lowest implementation risk; only the `Views.SEQUENCER` implementation changes under the hood.
-  - **Cons**
-    - No direct one-gesture access; entering the sequencer always goes via the Note view grid.
-    - Advanced sequencer shares space/mental model with other play tools; could feel crowded.
+- **Decision – True SHIFT-banked NoteViewSelect (Option C)**
+  - When `Modes.VIEW_SELECT` / `NoteViewSelectMode` is active:
+    - **SHIFT up**: the Note view grid shows a **primary bank** of play-related views (similar to today’s VIEWS/VIEWS_TOP layout, focused on everyday Play/Drum/etc. use).
+    - **SHIFT down**: the same grid switches to an **alternate/advanced bank**, emphasising the new ratchet/polymeter sequencer and other advanced sequence tools.
+  - Implementation sketch (to guide code):
+    - Extend `NoteViewSelectMode` to check `surface.isShiftPressed()` when drawing and when handling button events.
+    - Define two logical banks (e.g. `VIEWS_PRIMARY`, `VIEWS_ADVANCED`) rather than a single `VIEWS`/`VIEWS_TOP` pair.
+    - Map the **advanced bank** to include `Views.SEQUENCER` (the new mode), `Views.POLY_SEQUENCER`, and other deep tools; keep classic Play/Drum views in the primary bank.
+    - Ensure the Push 1 display clearly labels rows/columns so users understand when they are in the advanced bank.
+  - Rationale:
+    - Matches the mental model "hold SHIFT while in the play mode selector to see a second set of choices".
+    - Keeps advanced modes visually and mentally separated from everyday play modes while reusing the existing Note view selection infrastructure.
 
-- **Option B – Add SHIFT+Note quick access to sequencer (keep NoteViewSelectMode)**
-  - Extend `SelectPlayViewCommand.execute` so that:
-    - If **SHIFT is held** and `ButtonID.NOTE` is pressed, jump directly to the sequencer view (e.g. `Views.SEQUENCER`) instead of toggling `Modes.VIEW_SELECT`.
-    - If SHIFT is **not** held, keep today’s behaviour: either recall preferred view from Session or open/close `NoteViewSelectMode`.
-  - `NoteViewSelectMode` still lists the sequencer in its grid; SHIFT+Note is just a **shortcut**.
-  - **Pros**
-    - One-gesture access to the sequencer while preserving the existing Note-view selection UX.
-    - Fits existing patterns where SHIFT modifies button semantics (Undo/Redo, send paging, stop clip, etc.).
-  - **Cons**
-    - Adds another SHIFT combination users must learn.
-    - Slightly more complex logic in `SelectPlayViewCommand`.
-
-- **Option C – Turn NoteViewSelectMode into a true SHIFT-banked selector (more invasive)**
-  - Redesign `NoteViewSelectMode` so that **without SHIFT** it shows a "primary" set of views, and **with SHIFT held** it shows an alternate/advanced bank (e.g. sequencer-heavy views).
-  - Implementation sketch:
-    - Use one row (or both rows) for everyday views when SHIFT is up.
-    - When SHIFT is pressed, repurpose the same row(s) to display a different set (e.g. advanced sequencers, polymetric tools) while `Modes.VIEW_SELECT` is active.
-  - **Pros**
-    - Matches the mental model of "hold SHIFT while in the play mode selector to see a second set of choices".
-    - Keeps advanced modes visually separated from everyday play modes.
-  - **Cons**
-    - Requires non-trivial changes to `NoteViewSelectMode` display and button handling.
-    - Higher risk of regressions in existing play-view selection behaviour.
-    - Needs careful on-device testing to ensure the text display stays readable.
+- **Alternatives considered (not chosen for v1)**
+  - **Option A – Reuse existing NoteViewSelectMode grid with no SHIFT behaviour**
+    - Minimal change; simply repurpose `Views.SEQUENCER` to point to the new sequencer.
+    - Rejected because it offers no direct advanced/primary separation and no SHIFT-bank affordance.
+  - **Option B – SHIFT+Note quick access to sequencer**
+    - Add a SHIFT+Note shortcut that jumps directly to the sequencer while keeping today’s Note view grid.
+    - Rejected for v1 in favour of a more explicit two-bank model inside `NoteViewSelectMode`.
 
 ### 7.6 Lane Length Change Timing Setting
 

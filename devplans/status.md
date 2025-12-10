@@ -1,7 +1,12 @@
 # Project Status
 
-## Bitwig Custom Scales Panel
+## Table of Contents
 
+- [Bitwig Custom Scales Panel](#bitwig-custom-scales-panel)
+- [Push 1 Controller Improvements](#push-1-controller-improvements)
+- [Scale Control via Script Parameters](#scale-control-via-script-parameters)
+
+## Bitwig Custom Scales Panel
 ### Current State
 
 - **Core model & storage**
@@ -151,3 +156,110 @@
 - Perform the **Push E2E test** and record any issues or UX friction:
   - If the flow is acceptable with restart-only behavior, proceed to rolling the panel out to one or two additional controllers.
   - If the restart-only requirement feels too painful, reconsider elevating "live refresh of Scales" from future enhancement to near-term task.
+
+## Push 1 Controller Improvements
+
+### Current State
+
+- **Multi-page ConfigurationMode (Push 1)**
+  - `ConfigurationMode` now has three pages: `Noob`, `Pro`, and `Info`.
+  - While `ConfigurationMode` is active on Push 1, SCENE 1–3 act as page tabs:
+    - Scene 1 → Noob page.
+    - Scene 2 → Pro page.
+    - Scene 3 → Info page.
+  - Scene button presses in this mode are consumed by `ConfigurationMode` and do not trigger their usual view behaviour.
+
+- **Noob page – everyday performance setup**
+  - Exposes a small, high-value subset of settings:
+    - Pad feel preset (coarse threshold/curve combination).
+    - Pad threshold (coarse list of useful values).
+    - Velocity curve (coarse list of useful curves).
+    - Note repeat period.
+    - Note repeat length (when supported by the host).
+    - Accent level (Off / 96 / 110 / 127).
+    - Session view mode (Clips / Flipped / Scenes).
+    - Startup view (Play / Drum / Session).
+  - Shows a simple pad response meter ("Pad Vel") based on the last played pad velocity.
+
+- **Pro page – power-user tuning**
+  - Exposes the deeper configuration set for Push 1:
+    - Pad feel preset (same family as Noob).
+    - Full pad threshold list.
+    - Full velocity curve list.
+    - Track cursor behaviour (`cursorKeysTrackOption`: page / step / swap).
+    - Scene cursor behaviour (`cursorKeysSceneOption`: page / step).
+    - Ribbon mode (`RIBBON_MODE_*` family).
+    - Ribbon note repeat mode (`NOTE_REPEAT_*` family).
+  - Also shows a pad response meter for fine-tuning pad feel while editing these parameters.
+
+- **Info page – quick diagnostics**
+  - Displays:
+    - Firmware version.
+    - Startup view.
+    - Current Session view mode (Clips / Flipped / Scenes).
+
+- **Hardware-side reset shortcuts**
+  - In `ConfigurationMode` on Push 1, holding Delete and touching a knob resets pad feel parameters:
+    - Knob 1: reset both pad threshold and velocity curve to defaults.
+    - Knob 2: reset pad threshold to default.
+    - Knob 3: reset velocity curve to default.
+
+- **Session view & navigation tweaks**
+  - `SHIFT + Session` cycles the session view mode:
+    - Clips → Flipped → Scenes → Clips → …
+    - Each change updates the underlying configuration and shows a short banner on the Push 1 display (e.g. "SESSION VIEW: Scenes").
+  - When already in a session-style view, changing the Session view mode in configuration (from hardware or Bitwig settings) automatically switches between:
+    - `Views.SESSION` for Clips/Flipped.
+    - `Views.SCENE_PLAY` for Scenes.
+  - Track and scene cursor behaviour options are driven from the Pro page:
+    - Track cursor: move by page / move by 1 / swap tracks.
+    - Scene cursor: move by page / move by 1.
+
+### Remaining Work
+
+- **Testing & ergonomics**
+  - Finalize and run a concise manual test checklist for:
+    - Enter/exit of `ConfigurationMode`.
+    - SCENE tabbing between Noob/Pro/Info.
+    - Pad feel editing (including Delete+knob resets).
+    - Session view mode changes from both hardware and settings.
+  - Validate labels and layout on-device for readability on the Push 1 text display.
+
+- **Potential future extensions**
+  - Consider adding more expression-related settings to the Pro page if needed (e.g. additional accent / aftertouch options).
+  - Evaluate whether any of the existing Pro settings should also be surfaced, in simplified form, on the Noob page based on user feedback.
+
+## Scale Control via Script Parameters
+
+### Current State
+
+- **Canonical control surface for scales**
+  - The existing configuration fields in `AbstractConfiguration` are treated as the canonical external control surface for scale settings:
+    - `SCALES_SCALE` (scale type).
+    - `SCALES_BASE` (scale base note).
+    - `SCALES_IN_KEY` (In-Key vs Chromatic).
+    - `SCALES_LAYOUT` (scale layout).
+  - Controllers, host automation, and Remote Controls are expected to drive these parameters rather than any dedicated MIDI messages for scale control.
+
+- **Observer wiring**
+  - `AbstractControllerSetup` wires configuration changes back into `Scales` (and then into active views) via scale observers:
+    - Changes to `scale` → `setScaleByName(...)` → update view note mappings.
+    - Changes to `scaleBase` → `setScaleOffsetByName(...)` → update view note mappings.
+    - Changes to `scaleInKey` → `setChromatic(!isScaleInKey)` → update view note mappings.
+    - Changes to `scaleLayout` → `setScaleLayoutByName(...)` → update view note mappings.
+
+- **Design decision**
+  - Dedicated MIDI note/channel/CC mappings for scale control are explicitly out of scope for this fork.
+  - New work that needs to influence scale, base note, in-key/chromatic, or layout should do so via these configuration parameters.
+
+### Remaining Work
+
+- **Documentation & examples**
+  - Add a short "How to automate scales" section to the user-facing documentation, showing:
+    - How to map these parameters in Bitwig’s controller settings.
+    - How to expose them to Remote Controls or modulators.
+
+- **Light PoC / validation**
+  - Build and verify a small Bitwig project where:
+    - Remote Controls or automation lanes drive `scale`, `scaleBase`, `scaleInKey`, and `scaleLayout`.
+    - Changes are reflected immediately in `Scales` and the active play-related views on Push.

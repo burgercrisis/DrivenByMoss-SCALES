@@ -162,11 +162,14 @@ Later feature (not in MVP, but design-aware):
 
 ### Mode Entry / Exit
 
-- Dedicated way to enter **Parameter Sequencer Mode** from existing Push setup, for example:
-  - **NoteViewSelect entry (ROW1_5)**:
-    - In `NoteViewSelectMode`, the previously unused **`VIEWS[4]` slot (ROW1_5)** becomes "Parameter Sequencer" (lane-focus view).
-    - Pressing `NOTE` → entering NoteViewSelect → pressing **ROW1_5** activates the Parameter Sequencer lane-focus view (`Views.PARAM_SEQ` or equivalent).
-  - Additional entry mechanisms (mode cycle, layer toggle) can be added later but ROW1_5 in NoteViewSelect is the primary, discoverable entry point on Push 1.
+- Dedicated way to enter **Parameter Sequencer Mode** from the existing Push Note/Play selector, aligned with the **true SHIFT-banked NoteViewSelect** concept used by the Push 1 note sequencer devplan:
+  - **NoteViewSelect advanced-bank entry (e.g. advanced ROW1_5)**:
+    - In `NoteViewSelectMode`, within the **advanced SHIFT bank** of the Note/Play selector, one slot (e.g. advanced-bank `ROW1_5`) becomes "Parameter Sequencer" (lane-focus view).
+    - Flow (conceptual):
+      - Press `NOTE` to enter `NoteViewSelectMode`.
+      - Hold `SHIFT` to view the **advanced bank** of play/sequence tools.
+      - Press the advanced-bank slot (e.g. ROW1_5) labelled "Parameter Sequencer" to activate the lane-focus Parameter Sequencer view (`Views.PARAM_SEQ` or equivalent).
+  - Additional entry mechanisms (mode cycle, layer toggle) can be added later, but an advanced-bank NoteViewSelect entry remains the primary, discoverable entry point on Push 1.
 
 ---
 
@@ -197,9 +200,9 @@ Later feature (not in MVP, but design-aware):
 - **Lane overview view**:
   - Toggleable view where rows = lanes and columns = time.
   - Coarse visualization of all 8 lanes simultaneously.
-  - Accessed via a **latching selection in NoteViewSelect**:
-    - A second previously unused NoteViewSelect slot (e.g. `VIEWS[5]` / ROW1_6) becomes "Parameter Overview".
-    - Selecting that entry switches the Parameter Sequencer into overview layout; returning to the ROW1_5 entry (or an internal toggle) brings it back to lane-focus.
+  - Accessed via a **latching selection in the advanced bank of NoteViewSelect**:
+    - A second advanced-bank NoteViewSelect slot (e.g. ROW1_6 in the advanced bank) becomes "Parameter Overview".
+    - Selecting that entry switches the Parameter Sequencer into overview layout; returning to the advanced-bank Parameter Sequencer entry (e.g. ROW1_5) (or an internal toggle) brings it back to lane-focus.
 
 - **Per-step mode overrides**:
   - Currently lanes share a single mode (HOLD or RAMP).
@@ -220,7 +223,7 @@ Later feature (not in MVP, but design-aware):
 - **Lane focus & mode controls**: In Param view, **ROW1_i** selects the focused lane and **ROW2_i** toggles that lane’s mode between HOLD and RAMP.
 - **Ramp curve behaviour & modifier**: In RAMP mode, **`SHIFT + encoder`** (Param view only) changes **Bitwig’s own automation curve/slope value** for the CC segment between two active steps, while plain encoder turns still set values.
 - **CC page navigation**: In Param view, **Page Left/Right** remain time/step pagers; **`SHIFT + Page Left/Right`** is reserved for CC page up/down across CC ranges (1–8, 9–16, 17–24, ...).
-- **Lane overview access model**: When implemented, the lane overview view will be entered via a **dedicated NoteViewSelect entry** (e.g. ROW1_6), acting as a latching toggle between lane-focus and overview layouts.
+- **NoteViewSelect integration**: Parameter Sequencer entries (lane-focus and, later, lane overview) live in the **advanced SHIFT bank** of `NoteViewSelectMode`, sharing the same two-bank Note/Play selector model as the Push 1 ratchet/polymeter sequencer. Specific slots (currently illustrated as advanced ROW1_5 for lane-focus and advanced ROW1_6 for overview) may be adjusted when finalising the overall advanced-bank layout.
 
 ## Open Decisions / Implementation Notes
 
