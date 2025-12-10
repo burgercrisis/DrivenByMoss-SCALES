@@ -31,6 +31,7 @@ import de.mossgrabers.controller.ableton.push.command.trigger.PushAutomationComm
 import de.mossgrabers.controller.ableton.push.command.trigger.PushCursorCommand;
 import de.mossgrabers.controller.ableton.push.command.trigger.PushMetronomeCommand;
 import de.mossgrabers.controller.ableton.push.command.trigger.PushQuantizeCommand;
+import de.mossgrabers.controller.ableton.push.command.trigger.PushSceneButtonCommand;
 import de.mossgrabers.controller.ableton.push.command.trigger.RasteredKnobCommand;
 import de.mossgrabers.controller.ableton.push.command.trigger.ScalesCommand;
 import de.mossgrabers.controller.ableton.push.command.trigger.SelectCommand;
@@ -607,7 +608,7 @@ public class PushControllerSetup extends AbstractControllerSetup<PushControlSurf
             final ButtonID row2ButtonID = ButtonID.get (ButtonID.ROW2_1, i);
             this.addButton (row2ButtonID, "Row 2: " + (i + 1), new ButtonRowModeCommand<> (1, i, this.model, surface), PushControlSurface.PUSH_BUTTON_ROW2_1 + i, () -> this.getModeColor (row2ButtonID));
             final ButtonID sceneButtonID = ButtonID.get (ButtonID.SCENE1, i);
-            this.addButton (sceneButtonID, "Scene " + (i + 1), new ViewButtonCommand<> (sceneButtonID, surface), PushControlSurface.PUSH_BUTTON_SCENE1 + 7 - i, () -> this.getButtonColorFromActiveView (sceneButtonID));
+            this.addButton (sceneButtonID, "Scene " + (i + 1), new PushSceneButtonCommand (sceneButtonID, surface), PushControlSurface.PUSH_BUTTON_SCENE1 + 7 - i, () -> this.getButtonColorFromActiveView (sceneButtonID));
         }
 
         this.addButton (ButtonID.SHIFT, "Shift", new ShiftCommand (this.model, surface), PushControlSurface.PUSH_BUTTON_SHIFT);
