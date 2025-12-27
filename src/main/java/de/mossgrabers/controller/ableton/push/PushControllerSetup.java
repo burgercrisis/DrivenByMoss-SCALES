@@ -704,6 +704,10 @@ public class PushControllerSetup extends AbstractControllerSetup<PushControlSurf
                                 PushColorManager.PUSH_BUTTON_STATE_SOLO_HI);
                 this.addButton(ButtonID.SCALES, "Scale", new ScalesCommand(this.model, surface),
                                 PushControlSurface.PUSH_BUTTON_SCALES, () -> modeManager.isActive(Modes.SCALES));
+                this.addButton(ButtonID.SCALE_CREATE, "Create Scale",
+                                new CustomScaleCreationCommand(this.model, surface),
+                                PushControlSurface.PUSH_BUTTON_SCALE_CREATE,
+                                () -> modeManager.isActive(Modes.SCALE_CREATION));
                 this.addButton(ButtonID.ACCENT, "Accent", new AccentCommand(this.model, surface),
                                 PushControlSurface.PUSH_BUTTON_ACCENT, this.configuration::isAccentActive);
                 this.addButton(ButtonID.ADD_EFFECT, "Add Device", new PushAddEffectCommand(this.model, surface),
