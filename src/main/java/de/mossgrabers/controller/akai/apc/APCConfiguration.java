@@ -62,6 +62,11 @@ public class APCConfiguration extends AbstractConfiguration
         this.activateScaleLayoutSetting (documentSettings);
 
         ///////////////////////////
+        // Custom Scales (global to the extension)
+
+        this.activateCustomScalesSettings (globalSettings);
+
+        ///////////////////////////
         // Note Repeat
 
         this.activateNoteRepeatSetting (documentSettings);

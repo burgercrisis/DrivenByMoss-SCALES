@@ -96,6 +96,11 @@ public class APCminiConfiguration extends AbstractConfiguration
         this.activateScaleLayoutSetting (documentSettings);
 
         ///////////////////////////
+        // Custom Scales (global to the extension)
+
+        this.activateCustomScalesSettings (globalSettings);
+
+        ///////////////////////////
         // Play and Sequence
 
         this.activateQuantizeAmountSetting (globalSettings);

@@ -48,7 +48,7 @@
         - Writes the full list to `custom-scales.json` using `CustomScaleLibrary.saveAll(...)`.
         - IO failures are logged via `host.error(...)` and surfaced via `host.showNotification(...)`.
 
-- **Panel location & wiring (Push)**
+- **Panel location & wiring (Push & others)**
   - Devplan decision: Custom Scales panel lives in **global controller settings** (`globalSettings`), not per-project `documentSettings`.
   - `PushConfiguration.init(...)` now calls:
     - `activateScaleSetting(documentSettings)` (existing behavior).
@@ -57,6 +57,10 @@
     - `activateScaleLayoutSetting(documentSettings)`.
     - **New:** `activateCustomScalesSettings(globalSettings)`.
   - Result: Push exposes a `Scales - Custom Scales` section where the 8 slots can be edited.
+  - Additional controllers wired to the same global panel:
+    - `MaschineConfiguration` (Maschine MK3).
+    - `APCConfiguration` (Akai APC).
+    - `APCminiConfiguration` (Akai APCmini).
 
 - **Runtime behavior**
   - Devplan decision: v1 is **restart-only** for engine integration.
@@ -67,7 +71,7 @@
 - **TODO alignment**
   - Core model + storage + integration: **done**.
   - UI sweep to `getCurrentScaleName()`: **done**.
-  - Bitwig custom scales panel, wired to `CustomScaleLibrary` with validation and notifications: **done** (for Push).
+  - Bitwig custom scales panel, wired to `CustomScaleLibrary` with validation and notifications: **done** (for Push, Maschine MK3, APC, APCmini).
   - Remaining tracked TODO: **End-to-end test** (see below).
 
 ### Remaining Work
@@ -83,10 +87,10 @@
       - Selecting `My Blues` causes Push note modes to play in that scale.
       - The choice persists across Bitwig restart.
 
-- **Rollout beyond Push (optional next)**
-  - Mirror `activateCustomScalesSettings(globalSettings)` into other scale-aware configurations:
-    - e.g. Maschine, APC/APCmini, Fire, Launchpad, Oxi One, etc.
-  - This is independent of engine/core work and simply exposes the already-implemented panel across controllers.
+- **Further rollout beyond current controllers (optional next)**
+  - Mirror `activateCustomScalesSettings(globalSettings)` into additional scale-aware configurations beyond Push, Maschine MK3, APC, and APCmini:
+    - e.g. Fire, Launchpad, Oxi One, etc.
+  - This is independent of engine/core work and simply exposes the already-implemented panel across more controllers.
 
 - **Deletion semantics for in-use scales (future)**
   - Devplan has a locked decision: "Disallow deletion of a custom scale while it is active for any configuration".
