@@ -9,14 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * Static mode IDs and some helper functions.
  *
  * @author Jürgen Moßgraber
  */
-public enum Modes
-{
+public enum Modes {
     /** Single Track editing mode. */
     TRACK,
     /** Edit details of one track. */
@@ -120,6 +118,8 @@ public enum Modes
     ACCENT,
     /** Scale configuration. */
     SCALES,
+    /** Scale creation mode. */
+    SCALE_CREATION,
     /** Scale layout mode. */
     SCALE_LAYOUT,
     /** Pick length of new clips. */
@@ -173,121 +173,117 @@ public enum Modes
     /** A note sequencer mode. */
     NOTE_SEQUENCER;
 
-
     /** The name of the Track mode. */
-    public static final String              NAME_TRACK             = "Track";
+    public static final String NAME_TRACK = "Track";
     /** The name of the Volume mode. */
-    public static final String              NAME_VOLUME            = "Volume";
+    public static final String NAME_VOLUME = "Volume";
     /** The name of the Panning mode. */
-    public static final String              NAME_PANNING           = "Panning";
+    public static final String NAME_PANNING = "Panning";
     /** The name of the Sends mode. */
-    public static final String              NAME_SENDS             = "Sends";
+    public static final String NAME_SENDS = "Sends";
     /** The name of the Send 1 mode. */
-    public static final String              NAME_SEND1             = "Send 1";
+    public static final String NAME_SEND1 = "Send 1";
     /** The name of the Send 2 mode. */
-    public static final String              NAME_SEND2             = "Send 2";
+    public static final String NAME_SEND2 = "Send 2";
     /** The name of the Send 3 mode. */
-    public static final String              NAME_SEND3             = "Send 3";
+    public static final String NAME_SEND3 = "Send 3";
     /** The name of the Send 4 mode. */
-    public static final String              NAME_SEND4             = "Send 4";
+    public static final String NAME_SEND4 = "Send 4";
     /** The name of the Send 5 mode. */
-    public static final String              NAME_SEND5             = "Send 5";
+    public static final String NAME_SEND5 = "Send 5";
     /** The name of the Send 6 mode. */
-    public static final String              NAME_SEND6             = "Send 6";
+    public static final String NAME_SEND6 = "Send 6";
     /** The name of the Send 7 mode. */
-    public static final String              NAME_SEND7             = "Send 7";
+    public static final String NAME_SEND7 = "Send 7";
     /** The name of the Send 8 mode. */
-    public static final String              NAME_SEND8             = "Send 8";
+    public static final String NAME_SEND8 = "Send 8";
     /** The name of the Cross-fade mode. */
-    public static final String              NAME_CROSSFADE         = "Crossfade";
+    public static final String NAME_CROSSFADE = "Crossfade";
     /** The name of the Parameters mode. */
-    public static final String              NAME_PARAMETERS        = "Parameters";
+    public static final String NAME_PARAMETERS = "Parameters";
     /** The name of the Project/Track mode. */
-    public static final String              NAME_USER              = "Project/Track Parameters";
+    public static final String NAME_USER = "Project/Track Parameters";
     /** The name of the Equalizer mode. */
-    public static final String              NAME_EQUALIZER         = "Equalizer";
+    public static final String NAME_EQUALIZER = "Equalizer";
     /** The name of the Instrument parameters mode. */
-    public static final String              NAME_INSTRUMENT_PARAMS = "Instrument Parameters";
+    public static final String NAME_INSTRUMENT_PARAMS = "Instrument Parameters";
     /** The name of the Layer mode. */
-    public static final String              NAME_LAYER             = "Layer";
+    public static final String NAME_LAYER = "Layer";
     /** The name of the Layer Volume mode. */
-    public static final String              NAME_LAYER_VOLUME      = "Layer Volume";
+    public static final String NAME_LAYER_VOLUME = "Layer Volume";
     /** The name of the Layer Panning mode. */
-    public static final String              NAME_LAYER_PANNING     = "Layer Panning";
+    public static final String NAME_LAYER_PANNING = "Layer Panning";
     /** The name of the Layer Sends mode. */
-    public static final String              NAME_LAYER_SENDS       = "Layer Sends";
+    public static final String NAME_LAYER_SENDS = "Layer Sends";
     /** The name of the Layer Send 1 mode. */
-    public static final String              NAME_LAYER_SEND1       = "Layer Send 1";
+    public static final String NAME_LAYER_SEND1 = "Layer Send 1";
     /** The name of the Layer Send 2 mode. */
-    public static final String              NAME_LAYER_SEND2       = "Layer Send 2";
+    public static final String NAME_LAYER_SEND2 = "Layer Send 2";
     /** The name of the Layer Send 3 mode. */
-    public static final String              NAME_LAYER_SEND3       = "Layer Send 3";
+    public static final String NAME_LAYER_SEND3 = "Layer Send 3";
     /** The name of the Layer Send 4 mode. */
-    public static final String              NAME_LAYER_SEND4       = "Layer Send 4";
+    public static final String NAME_LAYER_SEND4 = "Layer Send 4";
     /** The name of the Layer Send 5 mode. */
-    public static final String              NAME_LAYER_SEND5       = "Layer Send 5";
+    public static final String NAME_LAYER_SEND5 = "Layer Send 5";
     /** The name of the Layer Send 6 mode. */
-    public static final String              NAME_LAYER_SEND6       = "Layer Send 6";
+    public static final String NAME_LAYER_SEND6 = "Layer Send 6";
     /** The name of the Layer Send 7 mode. */
-    public static final String              NAME_LAYER_SEND7       = "Layer Send 7";
+    public static final String NAME_LAYER_SEND7 = "Layer Send 7";
     /** The name of the Layer Send 8 mode. */
-    public static final String              NAME_LAYER_SEND8       = "Layer Send 8";
+    public static final String NAME_LAYER_SEND8 = "Layer Send 8";
     /** The name of the Automation mode. */
-    public static final String              NAME_AUTOMATION        = "Automation";
+    public static final String NAME_AUTOMATION = "Automation";
     /** The name of the Markers mode. */
-    public static final String              NAME_MARKERS           = "Markers";
+    public static final String NAME_MARKERS = "Markers";
 
-    private static final Set<Modes>         TRACK_MODES            = EnumSet.range (Modes.TRACK, Modes.STOP_CLIP);
-    private static final Set<Modes>         LAYER_MODES            = EnumSet.range (Modes.DEVICE_LAYER, Modes.DEVICE_LAYER_DETAILS);
-    private static final Set<Modes>         SEND_MODES             = EnumSet.range (Modes.SEND1, Modes.SEND8);
-    private static final Set<Modes>         LAYER_SEND_MODES       = EnumSet.range (Modes.DEVICE_LAYER_SEND1, Modes.DEVICE_LAYER_SEND8);
-    private static final Set<Modes>         MIX_MODES              = EnumSet.range (Modes.TRACK, Modes.SEND);
-    private static final Set<Modes>         MASTER_MODES           = EnumSet.of (Modes.MASTER, Modes.MASTER_TEMP, Modes.FRAME);
+    private static final Set<Modes> TRACK_MODES = EnumSet.range(Modes.TRACK, Modes.STOP_CLIP);
+    private static final Set<Modes> LAYER_MODES = EnumSet.range(Modes.DEVICE_LAYER, Modes.DEVICE_LAYER_DETAILS);
+    private static final Set<Modes> SEND_MODES = EnumSet.range(Modes.SEND1, Modes.SEND8);
+    private static final Set<Modes> LAYER_SEND_MODES = EnumSet.range(Modes.DEVICE_LAYER_SEND1,
+            Modes.DEVICE_LAYER_SEND8);
+    private static final Set<Modes> MIX_MODES = EnumSet.range(Modes.TRACK, Modes.SEND);
+    private static final Set<Modes> MASTER_MODES = EnumSet.of(Modes.MASTER, Modes.MASTER_TEMP, Modes.FRAME);
 
-    private static final Map<String, Modes> MODE_NAMES             = new HashMap<> ();
+    private static final Map<String, Modes> MODE_NAMES = new HashMap<>();
 
-    static
-    {
-        TRACK_MODES.addAll (SEND_MODES);
+    static {
+        TRACK_MODES.addAll(SEND_MODES);
 
-        MODE_NAMES.put (NAME_TRACK, TRACK);
-        MODE_NAMES.put (NAME_VOLUME, VOLUME);
-        MODE_NAMES.put (NAME_PANNING, PAN);
-        MODE_NAMES.put (NAME_SEND1, SEND1);
-        MODE_NAMES.put (NAME_SEND2, SEND2);
-        MODE_NAMES.put (NAME_SEND3, SEND3);
-        MODE_NAMES.put (NAME_SEND4, SEND4);
-        MODE_NAMES.put (NAME_SEND5, SEND5);
-        MODE_NAMES.put (NAME_SEND6, SEND6);
-        MODE_NAMES.put (NAME_SEND7, SEND7);
-        MODE_NAMES.put (NAME_SEND8, SEND8);
-        MODE_NAMES.put (NAME_LAYER, DEVICE_LAYER);
-        MODE_NAMES.put (NAME_LAYER_VOLUME, DEVICE_LAYER_VOLUME);
-        MODE_NAMES.put (NAME_LAYER_PANNING, DEVICE_LAYER_PAN);
-        MODE_NAMES.put (NAME_LAYER_SEND1, DEVICE_LAYER_SEND1);
-        MODE_NAMES.put (NAME_LAYER_SEND2, DEVICE_LAYER_SEND2);
-        MODE_NAMES.put (NAME_LAYER_SEND3, DEVICE_LAYER_SEND3);
-        MODE_NAMES.put (NAME_LAYER_SEND4, DEVICE_LAYER_SEND4);
-        MODE_NAMES.put (NAME_LAYER_SEND5, DEVICE_LAYER_SEND5);
-        MODE_NAMES.put (NAME_LAYER_SEND6, DEVICE_LAYER_SEND6);
-        MODE_NAMES.put (NAME_LAYER_SEND7, DEVICE_LAYER_SEND7);
-        MODE_NAMES.put (NAME_LAYER_SEND8, DEVICE_LAYER_SEND8);
-        MODE_NAMES.put (NAME_PARAMETERS, DEVICE_PARAMS);
-        MODE_NAMES.put (NAME_USER, USER);
-        MODE_NAMES.put (NAME_EQUALIZER, EQ_DEVICE_PARAMS);
-        MODE_NAMES.put (NAME_INSTRUMENT_PARAMS, INSTRUMENT_DEVICE_PARAMS);
-        MODE_NAMES.put (NAME_MARKERS, MARKERS);
+        MODE_NAMES.put(NAME_TRACK, TRACK);
+        MODE_NAMES.put(NAME_VOLUME, VOLUME);
+        MODE_NAMES.put(NAME_PANNING, PAN);
+        MODE_NAMES.put(NAME_SEND1, SEND1);
+        MODE_NAMES.put(NAME_SEND2, SEND2);
+        MODE_NAMES.put(NAME_SEND3, SEND3);
+        MODE_NAMES.put(NAME_SEND4, SEND4);
+        MODE_NAMES.put(NAME_SEND5, SEND5);
+        MODE_NAMES.put(NAME_SEND6, SEND6);
+        MODE_NAMES.put(NAME_SEND7, SEND7);
+        MODE_NAMES.put(NAME_SEND8, SEND8);
+        MODE_NAMES.put(NAME_LAYER, DEVICE_LAYER);
+        MODE_NAMES.put(NAME_LAYER_VOLUME, DEVICE_LAYER_VOLUME);
+        MODE_NAMES.put(NAME_LAYER_PANNING, DEVICE_LAYER_PAN);
+        MODE_NAMES.put(NAME_LAYER_SEND1, DEVICE_LAYER_SEND1);
+        MODE_NAMES.put(NAME_LAYER_SEND2, DEVICE_LAYER_SEND2);
+        MODE_NAMES.put(NAME_LAYER_SEND3, DEVICE_LAYER_SEND3);
+        MODE_NAMES.put(NAME_LAYER_SEND4, DEVICE_LAYER_SEND4);
+        MODE_NAMES.put(NAME_LAYER_SEND5, DEVICE_LAYER_SEND5);
+        MODE_NAMES.put(NAME_LAYER_SEND6, DEVICE_LAYER_SEND6);
+        MODE_NAMES.put(NAME_LAYER_SEND7, DEVICE_LAYER_SEND7);
+        MODE_NAMES.put(NAME_LAYER_SEND8, DEVICE_LAYER_SEND8);
+        MODE_NAMES.put(NAME_PARAMETERS, DEVICE_PARAMS);
+        MODE_NAMES.put(NAME_USER, USER);
+        MODE_NAMES.put(NAME_EQUALIZER, EQ_DEVICE_PARAMS);
+        MODE_NAMES.put(NAME_INSTRUMENT_PARAMS, INSTRUMENT_DEVICE_PARAMS);
+        MODE_NAMES.put(NAME_MARKERS, MARKERS);
     }
-
 
     /**
      * Private due to utility class.
      */
-    private Modes ()
-    {
+    private Modes() {
         // Intentionally empty
     }
-
 
     /**
      * Returns true if the given mode ID is one of the send modes.
@@ -295,11 +291,9 @@ public enum Modes
      * @param modeId The mode ID to test
      * @return True if it is a send mode
      */
-    public static boolean isSendMode (final Modes modeId)
-    {
-        return SEND_MODES.contains (modeId);
+    public static boolean isSendMode(final Modes modeId) {
+        return SEND_MODES.contains(modeId);
     }
-
 
     /**
      * Returns true if the given mode ID is one of the track modes.
@@ -307,11 +301,9 @@ public enum Modes
      * @param modeId The mode ID to test
      * @return True if it is a track mode
      */
-    public static boolean isTrackMode (final Modes modeId)
-    {
-        return TRACK_MODES.contains (modeId);
+    public static boolean isTrackMode(final Modes modeId) {
+        return TRACK_MODES.contains(modeId);
     }
-
 
     /**
      * Returns true if the given mode ID is one of the mix modes.
@@ -319,11 +311,9 @@ public enum Modes
      * @param modeId The mode ID to test
      * @return True if it is a mix mode
      */
-    public static boolean isMixMode (final Modes modeId)
-    {
-        return MIX_MODES.contains (modeId);
+    public static boolean isMixMode(final Modes modeId) {
+        return MIX_MODES.contains(modeId);
     }
-
 
     /**
      * Returns true if the given mode ID is one of the device layer modes.
@@ -331,11 +321,9 @@ public enum Modes
      * @param modeId The mode ID to test
      * @return True if it is a device layer mode
      */
-    public static boolean isLayerMode (final Modes modeId)
-    {
-        return LAYER_MODES.contains (modeId);
+    public static boolean isLayerMode(final Modes modeId) {
+        return LAYER_MODES.contains(modeId);
     }
-
 
     /**
      * Returns true if the given mode ID is one of the layer send modes.
@@ -343,11 +331,9 @@ public enum Modes
      * @param modeId The mode ID to test
      * @return True if it is a layer send mode
      */
-    public static boolean isLayerSendMode (final Modes modeId)
-    {
-        return LAYER_SEND_MODES.contains (modeId);
+    public static boolean isLayerSendMode(final Modes modeId) {
+        return LAYER_SEND_MODES.contains(modeId);
     }
-
 
     /**
      * Returns true if the given mode ID is one of the master modes.
@@ -355,11 +341,9 @@ public enum Modes
      * @param modeId The mode ID to test
      * @return True if it is a master mode
      */
-    public static boolean isMasterMode (final Modes modeId)
-    {
-        return MASTER_MODES.contains (modeId);
+    public static boolean isMasterMode(final Modes modeId) {
+        return MASTER_MODES.contains(modeId);
     }
-
 
     /**
      * Returns true if the given mode ID is one of the device modes.
@@ -367,11 +351,9 @@ public enum Modes
      * @param modeId The mode ID to test
      * @return True if it is a device mode
      */
-    public static boolean isDeviceMode (final Modes modeId)
-    {
-        return LAYER_MODES.contains (modeId) || DEVICE_PARAMS == modeId;
+    public static boolean isDeviceMode(final Modes modeId) {
+        return LAYER_MODES.contains(modeId) || DEVICE_PARAMS == modeId;
     }
-
 
     /**
      * Get the mode by its' name.
@@ -379,11 +361,9 @@ public enum Modes
      * @param name The name of the note view
      * @return The note view
      */
-    public static Modes getModeByName (final String name)
-    {
-        return MODE_NAMES.get (name);
+    public static Modes getModeByName(final String name) {
+        return MODE_NAMES.get(name);
     }
-
 
     /**
      * Get the mode name.
@@ -391,26 +371,22 @@ public enum Modes
      * @param mode The mode ID
      * @return The mode name
      */
-    public static String getModeName (final Modes mode)
-    {
-        for (final Map.Entry<String, Modes> e: MODE_NAMES.entrySet ())
-        {
-            if (e.getValue () == mode)
-                return e.getKey ();
+    public static String getModeName(final Modes mode) {
+        for (final Map.Entry<String, Modes> e : MODE_NAMES.entrySet()) {
+            if (e.getValue() == mode)
+                return e.getKey();
         }
         return "Missing mode name";
     }
 
-
     /**
      * Get an offset mode.
      *
-     * @param mode The base mode
+     * @param mode   The base mode
      * @param offset The offset
      * @return The offset mode
      */
-    public static Modes get (final Modes mode, final int offset)
-    {
-        return Modes.values ()[mode.ordinal () + offset];
+    public static Modes get(final Modes mode, final int offset) {
+        return Modes.values()[mode.ordinal() + offset];
     }
 }
