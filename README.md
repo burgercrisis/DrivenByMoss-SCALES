@@ -1,3 +1,15 @@
+What I'm doing:
+
+ - **[Bitwig Custom Scales Panel](devplans/bigwig-custom-scales-panel.md)** – global custom scale library plus Bitwig settings panel shared across controllers.
+ - **[Push 1 Controller Improvements](devplans/push1-controller-improvements.md)** – richer on-device configuration pages, pad feel presets, and session/navigation tweaks.
+ - **[Scale Control via Script Parameters](devplans/push-midi-scale-control.md)** – treat scale, base note, in-key/chromatic, and layout as canonical script parameters for automation and Remote Controls.
+ - **[Push 1 Sequencer Mode – Ratchets & Polymeter Lanes](devplans/push1-sequencer-mode.md)** – new note sequencer grid with ratchets and polymeter lanes in an advanced Note/Play selector bank.
+ - **[Push Parameter Sequencer Mode](devplans/push-parameter-sequencer-mode.md)** – CC/automation sequencer layered with notes in the same Bitwig clip.
+ - **[Future Sequencer & Arpeggio Ideas](devplans/push-future-sequencer-and-arpeggio-ideas.md)** – backlog of experimental sequencer/arp concepts to explore after the core modes land.
+
+What Moss did:
+
+
 # DrivenByMoss
 Bitwig Studio extensions to support several controllers
 

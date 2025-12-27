@@ -95,12 +95,12 @@
   - While a selection is active, **hold SHIFT and tap any pad in the selection** to apply the next ratchet value to **all selected steps** at once (cycling as per Gesture A).
   - Useful for quickly creating patterns like “every other hat is ratcheted at 2×” or densifying fills across a block of steps.
 
-- **Visual feedback on pads** (conceptual)
-  - Distinguish ratcheted vs non-ratcheted steps using **pad colour, brightness, or blink rate**.
-  - Example mapping (conceptual only, to be validated against existing colour use):
-    - `1×`: normal step colour.
-    - `2×`: slightly brighter or alternative colour.
-    - `3×/4×`: stronger colour change or subtle blink.
+- **Visual feedback on pads (v1 – minimal)**
+  - Distinguish **ratcheted vs non-ratcheted** steps using pad colour or brightness only:
+    - `1×` (no ratchet): normal step colour.
+    - `>1×` (any ratchet): accent / brighter colour or simple blink.
+  - v1 explicitly **does not attempt** to encode all eight factors on the pads; exact values live on the Push 1 display.
+  - Richer multi-level mappings (different colours/blink rates for 2× vs 4× vs 8×, etc.) are future options if they prove necessary.
 
 - **Display feedback**
   - When a step is focused or edited, show something like:
