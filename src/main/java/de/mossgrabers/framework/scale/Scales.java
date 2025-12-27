@@ -15,48 +15,49 @@ import de.mossgrabers.framework.controller.valuechanger.IValueChanger;
 import de.mossgrabers.framework.scale.ScaleGrid.Orientation;
 
 /**
- * Helper class for applying scales to a row x column pad grid. There are different layouts
- * available including transpositions by octaves. Furthermore, specific matrices are supported for a
+ * Helper class for applying scales to a row x column pad grid. There are
+ * different layouts
+ * available including transpositions by octaves. Furthermore, specific matrices
+ * are supported for a
  * drum, a piano and a sequencer layout.
  *
  * @author Jürgen Moßgraber
  */
-public class Scales
-{
+public class Scales {
     /** The lowest drum note. */
-    public static final int             DRUM_NOTE_LOWER          = 4;
+    public static final int DRUM_NOTE_LOWER = 4;
     /** The highest drum note. */
-    public static final int             DRUM_NOTE_UPPER          = 100;
+    public static final int DRUM_NOTE_UPPER = 100;
 
-    private static final int            DRUM_DEFAULT_OFFSET      = 16;
+    private static final int DRUM_DEFAULT_OFFSET = 16;
 
     /** The names of notes. */
-    public static final List<String>    NOTE_NAMES               = List.of ("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B");
+    public static final List<String> NOTE_NAMES = List.of("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb",
+            "B");
 
     /** The names of the base notes. */
-    public static final List<String>    BASES                    = List.of ("C", "G", "D", "A", "E", "B", "F", "Bb", "Eb", "Ab", "Db", "Gb");
+    public static final List<String> BASES = List.of("C", "G", "D", "A", "E", "B", "F", "Bb", "Eb", "Ab", "Db", "Gb");
 
     /** The semi-tone offsets of the base notes. */
-    private static final int []         OFFSETS                  =
-    {
-        0,
-        7,
-        2,
-        9,
-        4,
-        11,
-        5,
-        10,
-        3,
-        8,
-        1,
-        6
+    private static final int[] OFFSETS = {
+            0,
+            7,
+            2,
+            9,
+            4,
+            11,
+            5,
+            10,
+            3,
+            8,
+            1,
+            6
     };
 
     /** The MIDI note at which the drum grid starts. */
-    public static final int             DRUM_NOTE_START          = 36;
+    public static final int DRUM_NOTE_START = 36;
     /** The MIDI note at which the drum grid ends. */
-    public static final int             DRUM_NOTE_END            = 100;
+    public static final int DRUM_NOTE_END = 100;
 
     // @formatter:off
     /** The drum grid matrix. */
@@ -81,80 +82,80 @@ public class Scales
     // @formatter:on
 
     /** Color index when the pad is turned off. */
-    public static final String          SCALE_COLOR_OFF          = "SCALE_COLOR_OFF";
+    public static final String SCALE_COLOR_OFF = "SCALE_COLOR_OFF";
     /** Color index when the pad is the base note of the scale. */
-    public static final String          SCALE_COLOR_OCTAVE       = "SCALE_COLOR_OCTAVE";
+    public static final String SCALE_COLOR_OCTAVE = "SCALE_COLOR_OCTAVE";
     /** Color index when the pad is a note of the scale. */
-    public static final String          SCALE_COLOR_NOTE         = "SCALE_COLOR_NOTE";
+    public static final String SCALE_COLOR_NOTE = "SCALE_COLOR_NOTE";
     /** Color index when the pad is a note which is not part of the scale. */
-    public static final String          SCALE_COLOR_OUT_OF_SCALE = "SCALE_COLOR_OUT_OF_SCALE";
+    public static final String SCALE_COLOR_OUT_OF_SCALE = "SCALE_COLOR_OUT_OF_SCALE";
 
     /** Number of octaves which can be transposed up and down. */
-    public static final int             OCTAVE_RANGE             = 4;
-    /** Number of octaves which can be transposed up and down in the piano layout. */
-    public static final int             PIANO_OCTAVE_RANGE       = 3;
+    public static final int OCTAVE_RANGE = 4;
+    /**
+     * Number of octaves which can be transposed up and down in the piano layout.
+     */
+    public static final int PIANO_OCTAVE_RANGE = 3;
     /** Number of upper drum octave limit. */
-    public static final int             DRUM_OCTAVE_UPPER        = 4;
+    public static final int DRUM_OCTAVE_UPPER = 4;
     /** Number of lower drum octave limit. */
-    public static final int             DRUM_OCTAVE_LOWER        = -2;
+    public static final int DRUM_OCTAVE_LOWER = -2;
 
-    private Scale                       selectedScale            = Scale.MAJOR;
-    private CustomScale                 selectedCustomScale;
+    private Scale selectedScale = Scale.MAJOR;
+    private CustomScale selectedCustomScale;
 
-    private int                         scaleOffset              = 0;                                                                        // C
-    private ScaleLayout                 scaleLayout              = ScaleLayout.FOURTH_UP;
-    private Orientation                 orientation              = Orientation.ORIENT_UP;
-    private boolean                     chromaticOn              = false;
-    private int                         scaleShift               = 3;
-    private int                         semitoneShift            = 5;
-    private int                         octave                   = 0;
-    private final int                   defaultOctave;
-    private int                         drumOffset;
-    private int                         drumDefaultOffset;
-    private int                         pianoOctave              = 0;
-    private int                         startNote;
-    private int                         endNote;
-    private final int                   numColumns;
-    private final int                   numRows;
+    private int scaleOffset = 0; // C
+    private ScaleLayout scaleLayout = ScaleLayout.FOURTH_UP;
+    private Orientation orientation = Orientation.ORIENT_UP;
+    private boolean chromaticOn = false;
+    private int scaleShift = 3;
+    private int semitoneShift = 5;
+    private int octave = 0;
+    private final int defaultOctave;
+    private int drumOffset;
+    private int drumDefaultOffset;
+    private int pianoOctave = 0;
+    private int startNote;
+    private int endNote;
+    private final int numColumns;
+    private final int numRows;
 
-    private int []                      drumMatrix               = DRUM_MATRIX;
-    private int                         drumNoteStart            = DRUM_NOTE_START;
-    private int                         drumNoteEnd              = DRUM_NOTE_END;
+    private int[] drumMatrix = DRUM_MATRIX;
+    private int drumNoteStart = DRUM_NOTE_START;
+    private int drumNoteEnd = DRUM_NOTE_END;
 
-    private final Map<Scale, ScaleGrid> scaleGrids               = new EnumMap<> (Scale.class);
-    private final Map<Scale, ChordGrid> chordGrids               = new EnumMap<> (Scale.class);
-    private List<CustomScale>           customScales             = Collections.emptyList ();
+    private final Map<Scale, ScaleGrid> scaleGrids = new EnumMap<>(Scale.class);
+    private final Map<Scale, ChordGrid> chordGrids = new EnumMap<>(Scale.class);
+    private List<CustomScale> customScales = Collections.emptyList();
 
-    private final IValueChanger         valueChanger;
-
+    private final IValueChanger valueChanger;
 
     /**
      * Constructor.
      *
      * @param valueChanger A value changer
-     * @param startNote The first MIDI note of the pad grid
-     * @param endNote The last MIDI note of the pad grid
-     * @param numColumns The number of columns of the pad grid
-     * @param numRows The number of rows of the pad grid
+     * @param startNote    The first MIDI note of the pad grid
+     * @param endNote      The last MIDI note of the pad grid
+     * @param numColumns   The number of columns of the pad grid
+     * @param numRows      The number of rows of the pad grid
      */
-    public Scales (final IValueChanger valueChanger, final int startNote, final int endNote, final int numColumns, final int numRows)
-    {
-        this (valueChanger, startNote, endNote, numColumns, numRows, 0);
+    public Scales(final IValueChanger valueChanger, final int startNote, final int endNote, final int numColumns,
+            final int numRows) {
+        this(valueChanger, startNote, endNote, numColumns, numRows, 0);
     }
 
-
     /**
      * Constructor.
      *
-     * @param valueChanger A value changer
-     * @param startNote The first MIDI note of the pad grid
-     * @param endNote The last MIDI note of the pad grid
-     * @param numColumns The number of columns of the pad grid
-     * @param numRows The number of rows of the pad grid
+     * @param valueChanger  A value changer
+     * @param startNote     The first MIDI note of the pad grid
+     * @param endNote       The last MIDI note of the pad grid
+     * @param numColumns    The number of columns of the pad grid
+     * @param numRows       The number of rows of the pad grid
      * @param defaultOctave The fault octave
      */
-    public Scales (final IValueChanger valueChanger, final int startNote, final int endNote, final int numColumns, final int numRows, final int defaultOctave)
-    {
+    public Scales(final IValueChanger valueChanger, final int startNote, final int endNote, final int numColumns,
+            final int numRows, final int defaultOctave) {
         this.valueChanger = valueChanger;
         this.startNote = startNote;
         this.endNote = endNote; // last note + 1
@@ -166,88 +167,95 @@ public class Scales
         this.drumOffset = this.drumNoteStart;
         this.drumDefaultOffset = DRUM_DEFAULT_OFFSET;
 
-        this.generateMatrices ();
+        this.generateMatrices();
     }
-
 
     /**
      * Inject the current list of custom scales. The list is copied defensively.
      *
      * @param customScales The custom scales to use, or {@code null} for none
      */
-    public void setCustomScales (final List<CustomScale> customScales)
-    {
-        if (customScales == null || customScales.isEmpty ())
-            this.customScales = Collections.emptyList ();
+    public void setCustomScales(final List<CustomScale> customScales) {
+        if (customScales == null || customScales.isEmpty())
+            this.customScales = Collections.emptyList();
         else
-            this.customScales = List.copyOf (customScales);
+            this.customScales = List.copyOf(customScales);
     }
-
 
     /**
      * Get the name of the currently active scale (custom or built-in).
      *
      * @return The active scale name
      */
-    public String getCurrentScaleName ()
-    {
-        if (this.selectedCustomScale != null && this.selectedCustomScale.getName () != null)
-            return this.selectedCustomScale.getName ();
-        return this.selectedScale.getName ();
+    public String getCurrentScaleName() {
+        if (this.selectedCustomScale != null && this.selectedCustomScale.getName() != null)
+            return this.selectedCustomScale.getName();
+        return this.selectedScale.getName();
     }
 
+    /**
+     * Get all available scale names (built-in + custom).
+     *
+     * @return Array containing all scale names
+     */
+    public String[] getAllScaleNames() {
+        final String[] builtIn = Scale.getNames();
+
+        if (this.customScales == null || this.customScales.isEmpty())
+            return builtIn;
+
+        final String[] allNames = new String[builtIn.length + this.customScales.size()];
+        System.arraycopy(builtIn, 0, allNames, 0, builtIn.length);
+
+        for (int i = 0; i < this.customScales.size(); i++) {
+            final CustomScale scale = this.customScales.get(i);
+            allNames[builtIn.length + i] = scale != null ? scale.getName() : "";
+        }
+
+        return allNames;
+    }
 
     /**
      * Get the currently selected scale.
      *
      * @return The scale
      */
-    public Scale getScale ()
-    {
+    public Scale getScale() {
         return this.selectedScale;
     }
-
 
     /**
      * Set the scale.
      *
      * @param scale The scale to set
      */
-    public void setScale (final Scale scale)
-    {
+    public void setScale(final Scale scale) {
         this.selectedScale = scale;
         this.selectedCustomScale = null;
     }
-
 
     /**
      * Set the scale by its name.
      *
      * @param scaleName The name of the scale to set
      */
-    public void setScaleByName (final String scaleName)
-    {
+    public void setScaleByName(final String scaleName) {
         this.selectedCustomScale = null;
 
-        if (scaleName == null)
-        {
+        if (scaleName == null) {
             this.selectedScale = Scale.MAJOR;
             return;
         }
 
-        final Scale builtIn = Scale.getByName (scaleName);
-        if (builtIn != null)
-        {
+        final Scale builtIn = Scale.getByName(scaleName);
+        if (builtIn != null) {
             this.selectedScale = builtIn;
             return;
         }
 
-        if (this.customScales != null && !this.customScales.isEmpty ())
-        {
-            for (final CustomScale scale: this.customScales)
-            {
-                if (scale != null && scaleName.equals (scale.getName ()))
-                {
+        if (this.customScales != null && !this.customScales.isEmpty()) {
+            for (final CustomScale scale : this.customScales) {
+                if (scale != null && scaleName.equals(scale.getName())) {
                     this.selectedCustomScale = scale;
                     return;
                 }
@@ -255,557 +263,524 @@ public class Scales
         }
     }
 
+    /**
+     * Change the scale value using all available scales (built-in + custom).
+     *
+     * @param control The control value
+     */
+    public void changeAllScale(final int control) {
+        final String[] allNames = this.getAllScaleNames();
+        final String currentName = this.getCurrentScaleName();
+        int currentIndex = 0;
+        for (int i = 0; i < allNames.length; i++) {
+            if (allNames[i].equals(currentName)) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        final int newIndex = this.valueChanger.changeValue(control, currentIndex, -100, allNames.length);
+        final String newScaleName = allNames[newIndex];
+        this.setScaleByName(newScaleName);
+    }
+
+    /**
+     * Select the previous scale from all available scales (built-in + custom).
+     */
+    public void prevAllScale() {
+        final String[] allNames = this.getAllScaleNames();
+        final String currentName = this.getCurrentScaleName();
+        int currentIndex = 0;
+        for (int i = 0; i < allNames.length; i++) {
+            if (allNames[i].equals(currentName)) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        final int newIndex = Math.max(0, currentIndex - 1);
+        this.setScaleByName(allNames[newIndex]);
+    }
+
+    /**
+     * Select the next scale from all available scales (built-in + custom).
+     */
+    public void nextAllScale() {
+        final String[] allNames = this.getAllScaleNames();
+        final String currentName = this.getCurrentScaleName();
+        int currentIndex = 0;
+        for (int i = 0; i < allNames.length; i++) {
+            if (allNames[i].equals(currentName)) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        final int newIndex = Math.min(allNames.length - 1, currentIndex + 1);
+        this.setScaleByName(allNames[newIndex]);
+    }
 
     /**
      * Change the scale value.
      *
      * @param control The control value
      */
-    public void changeScale (final int control)
-    {
-        final Scale [] values = Scale.values ();
-        final int index = this.valueChanger.changeValue (control, this.selectedScale.ordinal (), -100, values.length);
+    public void changeScale(final int control) {
+        final Scale[] values = Scale.values();
+        final int index = this.valueChanger.changeValue(control, this.selectedScale.ordinal(), -100, values.length);
         this.selectedScale = values[index];
         this.selectedCustomScale = null;
     }
-
 
     /**
      * Returns true if there is a previous scale to select.
      *
      * @return True if there is a previous scale to select
      */
-    public boolean hasPrevScale ()
-    {
-        return this.selectedScale.ordinal () > 0;
+    public boolean hasPrevScale() {
+        return this.selectedScale.ordinal() > 0;
     }
-
 
     /**
      * Returns true if there is a next scale to select.
      *
      * @return True if there is a next scale to select
      */
-    public boolean hasNextScale ()
-    {
-        return this.selectedScale.ordinal () < Scale.values ().length - 1;
+    public boolean hasNextScale() {
+        return this.selectedScale.ordinal() < Scale.values().length - 1;
     }
-
 
     /**
      * Select the previous scale.
      */
-    public void prevScale ()
-    {
-        final Scale [] values = Scale.values ();
-        this.selectedScale = values[Math.max (0, this.selectedScale.ordinal () - 1)];
+    public void prevScale() {
+        final Scale[] values = Scale.values();
+        this.selectedScale = values[Math.max(0, this.selectedScale.ordinal() - 1)];
         this.selectedCustomScale = null;
     }
-
 
     /**
      * Select the next scale.
      */
-    public void nextScale ()
-    {
-        final Scale [] values = Scale.values ();
-        this.selectedScale = values[Math.min (values.length - 1, this.selectedScale.ordinal () + 1)];
+    public void nextScale() {
+        final Scale[] values = Scale.values();
+        this.selectedScale = values[Math.min(values.length - 1, this.selectedScale.ordinal() + 1)];
         this.selectedCustomScale = null;
     }
-
 
     /**
      * Returns true if there is a previous scale offset to select.
      *
      * @return True if there is a previous scale offset to select
      */
-    public boolean hasPrevScaleOffset ()
-    {
+    public boolean hasPrevScaleOffset() {
         return this.scaleOffset > 0;
     }
-
 
     /**
      * Returns true if there is a next scale offset to select.
      *
      * @return True if there is a next scale offset to select
      */
-    public boolean hasNextScaleOffset ()
-    {
+    public boolean hasNextScaleOffset() {
         return this.scaleOffset < Scales.OFFSETS.length - 1;
     }
-
 
     /**
      * Select the previous scale offset.
      */
-    public void prevScaleOffset ()
-    {
-        this.setScaleOffsetByIndex (this.scaleOffset - 1);
+    public void prevScaleOffset() {
+        this.setScaleOffsetByIndex(this.scaleOffset - 1);
     }
-
 
     /**
      * Select the next scale offset.
      */
-    public void nextScaleOffset ()
-    {
-        this.setScaleOffsetByIndex (this.scaleOffset + 1);
+    public void nextScaleOffset() {
+        this.setScaleOffsetByIndex(this.scaleOffset + 1);
     }
-
 
     /**
      * Get the base note offset to use for the current scale.
      *
      * @return The index of the offset
      */
-    public int getScaleOffset ()
-    {
+    public int getScaleOffset() {
         return Scales.OFFSETS[this.scaleOffset];
     }
-
 
     /**
      * Get the index of the base note (offset) to use for the current scale.
      *
      * @return The index of the offset
      */
-    public int getScaleOffsetIndex ()
-    {
+    public int getScaleOffsetIndex() {
         return this.scaleOffset;
     }
-
 
     /**
      * Set the base note (offset) to use for the current scale.
      *
      * @param scaleOffsetIndex The index of the offset
      */
-    public void setScaleOffsetByIndex (final int scaleOffsetIndex)
-    {
-        this.scaleOffset = Math.max (0, Math.min (scaleOffsetIndex, Scales.OFFSETS.length - 1));
+    public void setScaleOffsetByIndex(final int scaleOffsetIndex) {
+        this.scaleOffset = Math.max(0, Math.min(scaleOffsetIndex, Scales.OFFSETS.length - 1));
     }
-
 
     /**
      * Set the base note (offset) to use for the current scale by its name.
      *
      * @param scaleOffsetName The offsets name (e.g. 'G')
      */
-    public void setScaleOffsetByName (final String scaleOffsetName)
-    {
-        final int index = Scales.BASES.indexOf (scaleOffsetName);
+    public void setScaleOffsetByName(final String scaleOffsetName) {
+        final int index = Scales.BASES.indexOf(scaleOffsetName);
         if (index >= 0)
             this.scaleOffset = index;
     }
-
 
     /**
      * Get the scale layout.
      *
      * @return The scale layout
      */
-    public ScaleLayout getScaleLayout ()
-    {
+    public ScaleLayout getScaleLayout() {
         return this.scaleLayout;
     }
-
 
     /**
      * Set the scale layout.
      *
      * @param scaleLayout The scale layout
      */
-    public void setScaleLayout (final ScaleLayout scaleLayout)
-    {
+    public void setScaleLayout(final ScaleLayout scaleLayout) {
         this.scaleLayout = scaleLayout;
-        this.orientation = this.scaleLayout.ordinal () % 2 == 0 ? Orientation.ORIENT_UP : Orientation.ORIENT_RIGHT;
-        switch (this.scaleLayout)
-        {
+        this.orientation = this.scaleLayout.ordinal() % 2 == 0 ? Orientation.ORIENT_UP : Orientation.ORIENT_RIGHT;
+        switch (this.scaleLayout) {
             case FOURTH_UP:
             case FOURTH_RIGHT:
-                this.setPlayShift (3, 5);
+                this.setPlayShift(3, 5);
                 break;
             case THIRD_UP:
             case THIRD_RIGHT:
-                this.setPlayShift (2, 4);
+                this.setPlayShift(2, 4);
                 break;
             case SEQUENT_UP:
-                this.setPlayShift (this.numRows, this.numRows);
+                this.setPlayShift(this.numRows, this.numRows);
                 break;
             case SEQUENT_RIGHT:
-                this.setPlayShift (this.numColumns, this.numColumns);
+                this.setPlayShift(this.numColumns, this.numColumns);
                 break;
             case EIGHT_UP:
             case EIGHT_RIGHT:
             case EIGHT_UP_CENTER:
             case EIGHT_RIGHT_CENTER:
-                this.setPlayShift (7, 12);
+                this.setPlayShift(7, 12);
                 break;
             case STAGGERED_UP:
             case STAGGERED_RIGHT:
-                // Note, scaleShift is dynamically determined by ScaleGrid depending on scale. It
+                // Note, scaleShift is dynamically determined by ScaleGrid depending on scale.
+                // It
                 // isn't calculated
-                // here because scale could change without a subsequent layout change to refresh the
+                // here because scale could change without a subsequent layout change to refresh
+                // the
                 // computed value.
-                this.setPlayShift (0, 5);
+                this.setPlayShift(0, 5);
                 break;
         }
     }
-
 
     /**
      * Set the scale layout by its name.
      *
      * @param scaleLayoutName The name of the layout
      */
-    public void setScaleLayoutByName (final String scaleLayoutName)
-    {
-        this.setScaleLayout (ScaleLayout.getByName (scaleLayoutName));
+    public void setScaleLayoutByName(final String scaleLayoutName) {
+        this.setScaleLayout(ScaleLayout.getByName(scaleLayoutName));
     }
-
 
     /**
      * Returns true if there is a previous scale layout to select.
      *
      * @return True if there is a previous scale layout to select
      */
-    public boolean hasPrevScaleLayout ()
-    {
-        return this.scaleLayout.ordinal () > 0;
+    public boolean hasPrevScaleLayout() {
+        return this.scaleLayout.ordinal() > 0;
     }
-
 
     /**
      * Returns true if there is a next scale layout to select.
      *
      * @return True if there is a next scale layout to select
      */
-    public boolean hasNextScaleLayout ()
-    {
-        return this.scaleLayout.ordinal () < ScaleLayout.values ().length - 1;
+    public boolean hasNextScaleLayout() {
+        return this.scaleLayout.ordinal() < ScaleLayout.values().length - 1;
     }
-
 
     /**
      * Select the previous scale layout.
      */
-    public void prevScaleLayout ()
-    {
-        final ScaleLayout [] values = ScaleLayout.values ();
-        this.scaleLayout = values[Math.max (0, this.scaleLayout.ordinal () - 1)];
+    public void prevScaleLayout() {
+        final ScaleLayout[] values = ScaleLayout.values();
+        this.scaleLayout = values[Math.max(0, this.scaleLayout.ordinal() - 1)];
     }
-
 
     /**
      * Select the next scale layout.
      */
-    public void nextScaleLayout ()
-    {
-        final ScaleLayout [] values = ScaleLayout.values ();
-        this.scaleLayout = values[Math.min (values.length - 1, this.scaleLayout.ordinal () + 1)];
+    public void nextScaleLayout() {
+        final ScaleLayout[] values = ScaleLayout.values();
+        this.scaleLayout = values[Math.min(values.length - 1, this.scaleLayout.ordinal() + 1)];
     }
-
 
     /**
      * DIs-/enable chromatic mode.
      *
      * @param enable True to enable
      */
-    public void setChromatic (final boolean enable)
-    {
+    public void setChromatic(final boolean enable) {
         this.chromaticOn = enable;
     }
-
 
     /**
      * Toggle the chromatic setting.
      */
-    public void toggleChromatic ()
-    {
+    public void toggleChromatic() {
         this.chromaticOn = !this.chromaticOn;
     }
-
 
     /**
      * True if chromatic.
      *
      * @return The chromatic setting
      */
-    public boolean isChromatic ()
-    {
+    public boolean isChromatic() {
         return this.chromaticOn;
     }
-
 
     /**
      * Sets the octave offset.
      *
      * @param octave The octave
      */
-    public void setOctave (final int octave)
-    {
-        this.octave = Math.max (-Scales.OCTAVE_RANGE, Math.min (octave, Scales.OCTAVE_RANGE));
+    public void setOctave(final int octave) {
+        this.octave = Math.max(-Scales.OCTAVE_RANGE, Math.min(octave, Scales.OCTAVE_RANGE));
     }
-
 
     /**
      * Get the octave offset.
      *
      * @return The octave
      */
-    public int getOctave ()
-    {
+    public int getOctave() {
         return this.octave;
     }
-
 
     /**
      * Increase the octave offset by 1.
      */
-    public void incOctave ()
-    {
-        this.setOctave (this.octave + 1);
+    public void incOctave() {
+        this.setOctave(this.octave + 1);
     }
-
 
     /**
      * Decrease the octave offset by 1.
      */
-    public void decOctave ()
-    {
-        this.setOctave (this.octave - 1);
+    public void decOctave() {
+        this.setOctave(this.octave - 1);
     }
-
 
     /**
      * Resets the octave offset.
      */
-    public void resetOctave ()
-    {
-        this.setOctave (this.defaultOctave);
+    public void resetOctave() {
+        this.setOctave(this.defaultOctave);
     }
-
 
     /**
      * Get the current offset of the drum grid.
      *
      * @return The offset
      */
-    public int getDrumOffset ()
-    {
+    public int getDrumOffset() {
         return this.drumOffset;
     }
-
 
     /**
      * Returns true if the drum octave can be decreased.
      *
      * @return True if the drum octave can be decreased.
      */
-    public boolean canScrollDrumOctaveDown ()
-    {
+    public boolean canScrollDrumOctaveDown() {
 
         return this.drumOffset - this.drumDefaultOffset >= DRUM_NOTE_LOWER;
     }
-
 
     /**
      * Returns true if the drum octave can be increased.
      *
      * @return True if the drum octave can be increased.
      */
-    public boolean canScrollDrumOctaveUp ()
-    {
+    public boolean canScrollDrumOctaveUp() {
 
         return this.drumOffset + this.drumDefaultOffset <= DRUM_NOTE_UPPER;
     }
 
-
     /**
      * Increases the drum layout by default drum offset.
      */
-    public void incDrumOctave ()
-    {
-        this.incDrumOffset (this.drumDefaultOffset);
+    public void incDrumOctave() {
+        this.incDrumOffset(this.drumDefaultOffset);
     }
-
 
     /**
      * Decreases the drum layout by the default drum offset.
      */
-    public void decDrumOctave ()
-    {
-        this.decDrumOffset (this.drumDefaultOffset);
+    public void decDrumOctave() {
+        this.decDrumOffset(this.drumDefaultOffset);
     }
-
 
     /**
      * Resets the octave offset for the drum layout.
      */
-    public void resetDrumOctave ()
-    {
+    public void resetDrumOctave() {
         this.drumOffset = this.drumNoteStart;
     }
-
 
     /**
      * Increases the drum layout by the given offset.
      *
      * @param offset The offset by which to increase the drum offset
      */
-    public void incDrumOffset (final int offset)
-    {
-        this.drumOffset = Math.min (DRUM_NOTE_UPPER, this.drumOffset + offset);
+    public void incDrumOffset(final int offset) {
+        this.drumOffset = Math.min(DRUM_NOTE_UPPER, this.drumOffset + offset);
     }
-
 
     /**
      * Decreases the drum layout by the given offset.
      *
      * @param offset The offset by which to decrease the drum offset
      */
-    public void decDrumOffset (final int offset)
-    {
-        this.drumOffset = Math.max (DRUM_NOTE_LOWER, this.drumOffset - offset);
+    public void decDrumOffset(final int offset) {
+        this.drumOffset = Math.max(DRUM_NOTE_LOWER, this.drumOffset - offset);
     }
-
 
     /**
      * Set the default value for de-/increasing the drum offset.
      *
      * @param drumDefaultOffset The offset
      */
-    public void setDrumDefaultOffset (final int drumDefaultOffset)
-    {
+    public void setDrumDefaultOffset(final int drumDefaultOffset) {
         this.drumDefaultOffset = drumDefaultOffset;
     }
-
 
     /**
      * Get the default value for de-/increasing the drum offset.
      *
      * @return The offset
      */
-    public int getDrumDefaultOffset ()
-    {
+    public int getDrumDefaultOffset() {
         return this.drumDefaultOffset;
     }
-
 
     /**
      * Sets the octave offset for the piano layout.
      *
      * @param octave The octave offset
      */
-    public void setPianoOctave (final int octave)
-    {
-        this.pianoOctave = Math.max (-Scales.PIANO_OCTAVE_RANGE, Math.min (octave, Scales.PIANO_OCTAVE_RANGE));
+    public void setPianoOctave(final int octave) {
+        this.pianoOctave = Math.max(-Scales.PIANO_OCTAVE_RANGE, Math.min(octave, Scales.PIANO_OCTAVE_RANGE));
     }
-
 
     /**
      * Get the octave offset for the piano layout.
      *
      * @return The octave offset
      */
-    public int getPianoOctave ()
-    {
+    public int getPianoOctave() {
         return this.pianoOctave;
     }
-
 
     /**
      * Increases the piano layout by 1 octave.
      */
-    public void incPianoOctave ()
-    {
-        this.setPianoOctave (this.pianoOctave + 1);
+    public void incPianoOctave() {
+        this.setPianoOctave(this.pianoOctave + 1);
     }
-
 
     /**
      * Decreases the piano layout by 1 octave.
      */
-    public void decPianoOctave ()
-    {
-        this.setPianoOctave (this.pianoOctave - 1);
+    public void decPianoOctave() {
+        this.setPianoOctave(this.pianoOctave - 1);
     }
 
-
     /**
-     * Sets the number of scale and semitone steps that the notes in the next rows are shifted (e.g.
+     * Sets the number of scale and semitone steps that the notes in the next rows
+     * are shifted (e.g.
      * 4).
      *
-     * @param scaleShift The steps
+     * @param scaleShift    The steps
      * @param semitoneShift The steps
      */
-    public void setPlayShift (final int scaleShift, final int semitoneShift)
-    {
+    public void setPlayShift(final int scaleShift, final int semitoneShift) {
         this.scaleShift = scaleShift;
         this.semitoneShift = semitoneShift;
-        this.generateMatrices ();
+        this.generateMatrices();
     }
 
-
     /**
-     * Get the number of scale steps that the notes in the next rows are shifted (e.g. 4).
+     * Get the number of scale steps that the notes in the next rows are shifted
+     * (e.g. 4).
      *
      * @return The steps
      */
-    public int getScaleShift ()
-    {
+    public int getScaleShift() {
         return this.scaleShift;
     }
 
-
     /**
-     * Get the number of semitones the notes in the next rows are shifted in chromatic mode
+     * Get the number of semitones the notes in the next rows are shifted in
+     * chromatic mode
      *
      * @return The number of semitone
      */
-    public int getSemitoneShift ()
-    {
+    public int getSemitoneShift() {
         return this.semitoneShift;
     }
-
 
     /**
      * Get the color index for the given note respecting the note map.
      *
      * @param noteMap The note map
-     * @param note A note
+     * @param note    A note
      * @return The color index
      */
-    public String getColor (final int [] noteMap, final int note)
-    {
+    public String getColor(final int[] noteMap, final int note) {
         if (note == -1)
             return Scales.SCALE_COLOR_OFF;
         final int midiNote = noteMap[note];
         if (midiNote == -1)
             return Scales.SCALE_COLOR_OFF;
-        final int noteInOctave = this.toNoteInOctave (midiNote);
+        final int noteInOctave = this.toNoteInOctave(midiNote);
         if (noteInOctave == 0)
             return Scales.SCALE_COLOR_OCTAVE;
-        if (!this.isChromatic ())
+        if (!this.isChromatic())
             return Scales.SCALE_COLOR_NOTE;
-        return this.isInScale (noteInOctave) ? Scales.SCALE_COLOR_NOTE : Scales.SCALE_COLOR_OUT_OF_SCALE;
+        return this.isInScale(noteInOctave) ? Scales.SCALE_COLOR_NOTE : Scales.SCALE_COLOR_OUT_OF_SCALE;
     }
 
-
     /**
-     * Convert the MIDI note (0-127) to the note in an octave (0-11). Respect the currently active
+     * Convert the MIDI note (0-127) to the note in an octave (0-11). Respect the
+     * currently active
      * base note.
      *
      * @param midiNote The MIDI note to convert
      * @return The note in the octave
      */
-    public int toNoteInOctave (final int midiNote)
-    {
+    public int toNoteInOctave(final int midiNote) {
         // Add 12 to prevent negative values
         return (12 + midiNote - Scales.OFFSETS[this.scaleOffset]) % 12;
     }
-
 
     /**
      * Test if the note is part of the selected scale.
@@ -813,17 +788,14 @@ public class Scales
      * @param noteInOctave The note to test (0-11)
      * @return True if it is part of the scale
      */
-    public boolean isInScale (final int noteInOctave)
-    {
-        final int [] intervals = this.getActiveIntervals ();
-        for (final int interval: intervals)
-        {
+    public boolean isInScale(final int noteInOctave) {
+        final int[] intervals = this.getActiveIntervals();
+        for (final int interval : intervals) {
             if (interval == noteInOctave)
                 return true;
         }
         return false;
     }
-
 
     /**
      * Get the MIDI note which is the closest in the active scale.
@@ -831,18 +803,15 @@ public class Scales
      * @param midiNote The MIDI note (0-127)
      * @return The closest MIDI note in the scale (0-127)
      */
-    public int getNearestNoteInScale (final int midiNote)
-    {
-        final int noteInOctave = this.toNoteInOctave (midiNote);
+    public int getNearestNoteInScale(final int midiNote) {
+        final int noteInOctave = this.toNoteInOctave(midiNote);
 
         int diff = 12;
         int resultNoteInOctave = 0;
-        final int [] intervals = this.getActiveIntervals ();
-        for (final int interval: intervals)
-        {
-            final int newDiff = Math.abs (interval - noteInOctave);
-            if (Math.abs (interval - noteInOctave) < diff)
-            {
+        final int[] intervals = this.getActiveIntervals();
+        for (final int interval : intervals) {
+            final int newDiff = Math.abs(interval - noteInOctave);
+            if (Math.abs(interval - noteInOctave) < diff) {
                 diff = newDiff;
                 resultNoteInOctave = interval;
             }
@@ -854,61 +823,57 @@ public class Scales
         return octaves + (resultNoteInOctave + Scales.OFFSETS[this.scaleOffset]) % 12;
     }
 
-
     /**
      * Get the index of the note in the scale.
      *
      * @param midiNote The note for which to get the index
      * @return The index of the note or -1 if the note is out of scale
      */
-    public int getScaleIndex (final int midiNote)
-    {
-        final int noteInOctave = this.toNoteInOctave (midiNote);
+    public int getScaleIndex(final int midiNote) {
+        final int noteInOctave = this.toNoteInOctave(midiNote);
 
-        final int [] intervals = this.getActiveIntervals ();
+        final int[] intervals = this.getActiveIntervals();
 
-        for (int i = 0; i < intervals.length; i++)
-        {
+        for (int i = 0; i < intervals.length; i++) {
             if (intervals[i] == noteInOctave)
                 return i;
         }
         return -1;
     }
 
-
     /**
-     * Calculate the thirds on top of the given MIDI note. Respects the current octave, scale and
+     * Calculate the thirds on top of the given MIDI note. Respects the current
+     * octave, scale and
      * scale base.
      *
      * @param baseNote The base note of the chord
-     * @return The additional 2 thirds or an empty array if the baseNote is out of the scale
+     * @return The additional 2 thirds or an empty array if the baseNote is out of
+     *         the scale
      */
-    public int [] getThirdChord (final int baseNote)
-    {
-        return this.getChord (baseNote, 3, 5);
+    public int[] getThirdChord(final int baseNote) {
+        return this.getChord(baseNote, 3, 5);
     }
 
-
     /**
-     * Calculate the additional notes of a chord. Adds the given intervals. Respects the current
+     * Calculate the additional notes of a chord. Adds the given intervals. Respects
+     * the current
      * octave, scale and scale base.
      *
-     * @param baseNote The MIDI base note
+     * @param baseNote       The MIDI base note
      * @param addedIntervals The note intervals to add
-     * @return The additional notes, excluding the base note or an empty array if the baseNote is
+     * @return The additional notes, excluding the base note or an empty array if
+     *         the baseNote is
      *         out of the scale
      */
-    public int [] getChord (final int baseNote, final int... addedIntervals)
-    {
-        final int scaleIndex = this.getScaleIndex (baseNote);
+    public int[] getChord(final int baseNote, final int... addedIntervals) {
+        final int scaleIndex = this.getScaleIndex(baseNote);
         if (scaleIndex < 0)
-            return new int [0];
+            return new int[0];
 
-        final int [] intervals = this.getActiveIntervals ();
-        final int [] result = new int [addedIntervals.length];
+        final int[] intervals = this.getActiveIntervals();
+        final int[] result = new int[addedIntervals.length];
         final int baseOffset = this.startNote + Scales.OFFSETS[this.scaleOffset];
-        for (int i = 0; i < addedIntervals.length; i++)
-        {
+        for (int i = 0; i < addedIntervals.length; i++) {
             final int noteIndex = scaleIndex + addedIntervals[i] - 1;
             final int octaveNote = intervals[noteIndex % intervals.length];
             result[i] = baseOffset + (this.octave + noteIndex / intervals.length) * 12 + octaveNote;
@@ -917,17 +882,14 @@ public class Scales
         return result;
     }
 
-
     /**
      * Get the active note matrix.
      *
      * @return The matrix
      */
-    public int [] getNoteMatrix ()
-    {
-        return this.getNoteMatrix (this.getActiveMatrix ());
+    public int[] getNoteMatrix() {
+        return this.getNoteMatrix(this.getActiveMatrix());
     }
-
 
     /**
      * Get a note matrix.
@@ -935,44 +897,38 @@ public class Scales
      * @param matrix The input scale matrix
      * @return The matrix
      */
-    public int [] getNoteMatrix (final int [] matrix)
-    {
-        final int [] noteMap = Scales.getEmptyMatrix ();
-        for (int note = this.startNote; note < this.endNote; note++)
-        {
-            final int n = matrix[note - this.startNote] + Scales.OFFSETS[this.scaleOffset] + this.startNote + this.octave * 12;
+    public int[] getNoteMatrix(final int[] matrix) {
+        final int[] noteMap = Scales.getEmptyMatrix();
+        for (int note = this.startNote; note < this.endNote; note++) {
+            final int n = matrix[note - this.startNote] + Scales.OFFSETS[this.scaleOffset] + this.startNote
+                    + this.octave * 12;
             noteMap[note] = n < 0 || n > 127 ? -1 : n;
         }
         return noteMap;
     }
 
-
     /**
      * Get the active sequencer matrix.
      *
-     * @param length The expected length
+     * @param length     The expected length
      * @param noteOffset An offset to add to the notes
      * @return The matrix
      */
-    public int [] getSequencerMatrix (final int length, final int noteOffset)
-    {
-        final int [] noteMap = new int [length];
-        if (this.isChromatic ())
-        {
+    public int[] getSequencerMatrix(final int length, final int noteOffset) {
+        final int[] noteMap = new int[length];
+        if (this.isChromatic()) {
             for (int note = 0; note < length; note++)
                 noteMap[note] = noteOffset + note;
             return noteMap;
         }
 
-        final int [] intervals = this.getActiveIntervals ();
-        Arrays.fill (noteMap, -1);
+        final int[] intervals = this.getActiveIntervals();
+        Arrays.fill(noteMap, -1);
 
         final int noteInOctave = noteOffset % 12;
         int so = 0;
-        for (int i = 0; i < intervals.length; i++)
-        {
-            if (intervals[i] == noteInOctave)
-            {
+        for (int i = 0; i < intervals.length; i++) {
+            if (intervals[i] == noteInOctave) {
                 so = i;
                 break;
             }
@@ -982,8 +938,7 @@ public class Scales
             so = 0;
         final int no = noteOffset / 12 * 12;
 
-        for (int note = 0; note < length; note++)
-        {
+        for (int note = 0; note < length; note++) {
             final int index = so + note;
             final int oct = index / intervals.length * 12;
             final int n = Scales.OFFSETS[this.scaleOffset] + intervals[index % intervals.length] + no + oct;
@@ -992,29 +947,25 @@ public class Scales
         return noteMap;
     }
 
-
     /**
      * Get the piano matrix.
      *
-     * @param rows The number of rows
+     * @param rows    The number of rows
      * @param columns The number of columns
      * @return The matrix
      */
-    public int [] getPianoMatrix (final int rows, final int columns)
-    {
+    public int[] getPianoMatrix(final int rows, final int columns) {
         int octaveOffset = 3 + this.pianoOctave;
         int counter = this.startNote;
         final int rowOffset = columns / 7;
 
-        final int [] noteMap = Scales.getEmptyMatrix ();
+        final int[] noteMap = Scales.getEmptyMatrix();
 
-        for (int row = 0; row < rows; row++)
-        {
-            for (int col = 0; col < columns; col++)
-            {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
                 final int ns = PIANO_MATRIX[row % 2][col % 7];
                 if (ns >= 0 && counter < 128)
-                    noteMap[counter] = Math.min (ns + (octaveOffset + col / 7) * 12, 127);
+                    noteMap[counter] = Math.min(ns + (octaveOffset + col / 7) * 12, 127);
                 counter++;
             }
 
@@ -1025,44 +976,37 @@ public class Scales
         return noteMap;
     }
 
-
     /**
      * Get a new empty matrix. All notes are off.
      *
      * @return The empty matrix
      */
-    public static int [] getEmptyMatrix ()
-    {
-        final int [] emptyMatrix = new int [128];
-        Arrays.fill (emptyMatrix, -1);
+    public static int[] getEmptyMatrix() {
+        final int[] emptyMatrix = new int[128];
+        Arrays.fill(emptyMatrix, -1);
         return emptyMatrix;
     }
-
 
     /**
      * Get a new identity matrix. All notes are mapped to themselves.
      *
      * @return The identity matrix
      */
-    public static int [] getIdentityMatrix ()
-    {
-        final int [] identityMatrix = new int [128];
+    public static int[] getIdentityMatrix() {
+        final int[] identityMatrix = new int[128];
         for (int i = 0; i < 128; i++)
             identityMatrix[i] = i;
         return identityMatrix;
     }
-
 
     /**
      * Get the drum matrix.
      *
      * @return The drum matrix
      */
-    public int [] getDrumMatrix ()
-    {
-        final int [] noteMap = Scales.getEmptyMatrix ();
-        for (int note = this.drumNoteStart; note < this.drumNoteEnd; note++)
-        {
+    public int[] getDrumMatrix() {
+        final int[] noteMap = Scales.getEmptyMatrix();
+        for (int note = this.drumNoteStart; note < this.drumNoteEnd; note++) {
             final int ns = this.drumMatrix[note - this.drumNoteStart];
             final int n = ns == -1 ? -1 : ns + this.drumOffset;
             noteMap[note] = n < 0 || n > 127 ? -1 : n;
@@ -1070,91 +1014,79 @@ public class Scales
         return noteMap;
     }
 
-
     /**
      * Set a new drum matrix.
      *
      * @param matrix The new drum matrix
      */
-    public void setDrumMatrix (final int [] matrix)
-    {
+    public void setDrumMatrix(final int[] matrix) {
         this.drumMatrix = matrix;
     }
-
 
     /**
      * Set the first drum note.
      *
      * @param drumNoteStart The first drum note
      */
-    public void setDrumNoteStart (final int drumNoteStart)
-    {
+    public void setDrumNoteStart(final int drumNoteStart) {
         this.drumNoteStart = drumNoteStart;
     }
-
 
     /**
      * Set the last drum note.
      *
      * @param drumNoteEnd The last drum note
      */
-    public void setDrumNoteEnd (final int drumNoteEnd)
-    {
+    public void setDrumNoteEnd(final int drumNoteEnd) {
         this.drumNoteEnd = drumNoteEnd;
     }
 
-
     /**
-     * Create a text description for the current minimum and maximum notes of the scale, respecting
+     * Create a text description for the current minimum and maximum notes of the
+     * scale, respecting
      * offsets and octaves.
      *
      * @return The text
      */
-    public String getRangeText ()
-    {
-        final int [] matrix = this.getActiveMatrix ();
+    public String getRangeText() {
+        final int[] matrix = this.getActiveMatrix();
         final int offset = Scales.OFFSETS[this.scaleOffset];
-        return this.formatNote (offset + matrix[0]) + " to " + this.formatNote (offset + matrix[matrix.length - 1]);
+        return this.formatNote(offset + matrix[0]) + " to " + this.formatNote(offset + matrix[matrix.length - 1]);
     }
-
 
     /**
      * Create a text description for the from and to note parameters.
      *
      * @param from The start note
-     * @param to The end note
+     * @param to   The end note
      * @return The text
      */
-    public static String getSequencerRangeText (final int from, final int to)
-    {
-        return Scales.formatNoteAndOctave (from, -3) + " to " + Scales.formatNoteAndOctave (to, -3);
+    public static String getSequencerRangeText(final int from, final int to) {
+        return Scales.formatNoteAndOctave(from, -3) + " to " + Scales.formatNoteAndOctave(to, -3);
     }
 
-
     /**
-     * Create a text description for the current minimum and maximum notes of the drum layout,
+     * Create a text description for the current minimum and maximum notes of the
+     * drum layout,
      * respecting the octaves.
      *
      * @return The text
      */
-    public String getDrumRangeText ()
-    {
-        final int s = this.getDrumOffset ();
-        return "Offset: " + (s - this.drumNoteStart) + " (" + Scales.formatDrumNote (s) + ")";
+    public String getDrumRangeText() {
+        final int s = this.getDrumOffset();
+        return "Offset: " + (s - this.drumNoteStart) + " (" + Scales.formatDrumNote(s) + ")";
     }
 
-
     /**
-     * Create a text description for the current minimum and maximum notes of the piano layout,
+     * Create a text description for the current minimum and maximum notes of the
+     * piano layout,
      * respecting the octaves.
      *
      * @return The text
      */
-    public String getPianoRangeText ()
-    {
-        return this.formatNote (this.pianoOctave * 12) + " to " + this.formatNote ((this.pianoOctave + 4) * 12);
+    public String getPianoRangeText() {
+        return this.formatNote(this.pianoOctave * 12) + " to " + this.formatNote((this.pianoOctave + 4) * 12);
     }
-
 
     /**
      * Format a note as text.
@@ -1162,11 +1094,9 @@ public class Scales
      * @param note The note
      * @return The text
      */
-    public String formatNote (final int note)
-    {
-        return Scales.formatNoteAndOctave (note, this.octave);
+    public String formatNote(final int note) {
+        return Scales.formatNoteAndOctave(note, this.octave);
     }
-
 
     /**
      * Format a drum note as text.
@@ -1174,168 +1104,145 @@ public class Scales
      * @param note The note
      * @return The text
      */
-    public static String formatDrumNote (final int note)
-    {
-        return Scales.formatNoteAndOctave (note, -3);
+    public static String formatDrumNote(final int note) {
+        return Scales.formatNoteAndOctave(note, -3);
     }
-
 
     /**
      * Formats a note with an octave.
      *
-     * @param note The note
+     * @param note         The note
      * @param octaveOffset The octave
      * @return The text
      */
-    public static String formatNoteAndOctave (final int note, final int octaveOffset)
-    {
-        return Scales.NOTE_NAMES.get (Math.abs (note % 12)) + Integer.toString (note / 12 + octaveOffset + 1);
+    public static String formatNoteAndOctave(final int note, final int octaveOffset) {
+        return Scales.NOTE_NAMES.get(Math.abs(note % 12)) + Integer.toString(note / 12 + octaveOffset + 1);
     }
-
 
     /**
      * Get the matrix of the selected scale.
      *
      * @return The matrix
      */
-    public int [] getActiveMatrix ()
-    {
-        final ScaleGrid scaleGrid = this.scaleGrids.get (this.selectedScale);
-        return this.isChromatic () ? scaleGrid.getChromatic () : scaleGrid.getMatrix ();
+    public int[] getActiveMatrix() {
+        final ScaleGrid scaleGrid = this.scaleGrids.get(this.selectedScale);
+        return this.isChromatic() ? scaleGrid.getChromatic() : scaleGrid.getMatrix();
     }
-
 
     /**
      * Get the chord matrix of the selected scale.
      *
      * @return The matrix
      */
-    public int [] getActiveChordMatrix ()
-    {
-        return this.chordGrids.get (this.selectedScale).getMatrix ();
+    public int[] getActiveChordMatrix() {
+        return this.chordGrids.get(this.selectedScale).getMatrix();
     }
-
 
     /**
      * Get the active scale intervals (custom or built-in).
      *
      * @return The active semitone intervals array
      */
-    private int [] getActiveIntervals ()
-    {
-        if (this.selectedCustomScale != null)
-        {
-            final int [] intervals = this.selectedCustomScale.getIntervals ();
+    private int[] getActiveIntervals() {
+        if (this.selectedCustomScale != null) {
+            final int[] intervals = this.selectedCustomScale.getIntervals();
             if (intervals != null && intervals.length > 0)
                 return intervals;
         }
-        return this.selectedScale.getIntervals ();
+        return this.selectedScale.getIntervals();
     }
 
-
     /**
-     * Overwrite to hook in translation for grids which do not send MIDI notes 36-100.
+     * Overwrite to hook in translation for grids which do not send MIDI notes
+     * 36-100.
      *
      * @param matrix The matrix to translate
      * @return The modified matrix
      */
-    public int [] translateMatrixToGrid (final int [] matrix)
-    {
+    public int[] translateMatrixToGrid(final int[] matrix) {
         return matrix;
     }
-
 
     /**
      * Generate all matrices for all scales.
      */
-    private void generateMatrices ()
-    {
-        this.scaleGrids.clear ();
-        this.chordGrids.clear ();
-        for (final Scale scale: Scale.values ())
-        {
-            this.scaleGrids.put (scale, new ScaleGrid (scale, this.scaleLayout, this.orientation, this.numRows, this.numColumns, this.scaleShift, this.semitoneShift));
-            this.chordGrids.put (scale, new ChordGrid (scale, this.numRows, this.numColumns));
+    private void generateMatrices() {
+        this.scaleGrids.clear();
+        this.chordGrids.clear();
+        for (final Scale scale : Scale.values()) {
+            this.scaleGrids.put(scale, new ScaleGrid(scale, this.scaleLayout, this.orientation, this.numRows,
+                    this.numColumns, this.scaleShift, this.semitoneShift));
+            this.chordGrids.put(scale, new ChordGrid(scale, this.numRows, this.numColumns));
         }
     }
-
 
     /**
      * Get the first MIDI note of the pad grid.
      *
      * @return The first MIDI note of the pad grid
      */
-    public int getStartNote ()
-    {
+    public int getStartNote() {
         return this.startNote;
     }
-
 
     /**
      * Set the first MIDI note of the pad grid.
      *
      * @param startNote The first MIDI note of the pad grid
      */
-    public void setStartNote (final int startNote)
-    {
+    public void setStartNote(final int startNote) {
         this.startNote = startNote;
     }
-
 
     /**
      * Get the last MIDI note of the pad grid.
      *
      * @return The last MIDI note of the pad grid
      */
-    public int getEndNote ()
-    {
+    public int getEndNote() {
         return this.endNote;
     }
-
 
     /**
      * Set the last MIDI note of the pad grid.
      *
      * @param endNote The last MIDI note of the pad grid
      */
-    public void setEndNote (final int endNote)
-    {
+    public void setEndNote(final int endNote) {
         this.endNote = endNote;
     }
 
-
     /**
-     * Update the configuration properties from this scale settings if they are different.
+     * Update the configuration properties from this scale settings if they are
+     * different.
      *
-     * @param configuration The configuration to which to write the changed properties
+     * @param configuration The configuration to which to write the changed
+     *                      properties
      */
-    public void updateScaleProperties (final Configuration configuration)
-    {
-        final String name = this.getCurrentScaleName ();
-        if (!configuration.getScale ().equals (name))
-            configuration.setScale (name);
+    public void updateScaleProperties(final Configuration configuration) {
+        final String name = this.getCurrentScaleName();
+        if (!configuration.getScale().equals(name))
+            configuration.setScale(name);
 
-        final String scaleBase = Scales.BASES.get (this.getScaleOffsetIndex ());
-        if (!configuration.getScaleBase ().equals (scaleBase))
-            configuration.setScaleBase (scaleBase);
+        final String scaleBase = Scales.BASES.get(this.getScaleOffsetIndex());
+        if (!configuration.getScaleBase().equals(scaleBase))
+            configuration.setScaleBase(scaleBase);
 
-        final boolean isChromatic = this.isChromatic ();
-        if (configuration.isScaleInKey () == isChromatic)
-            configuration.setScaleInKey (!isChromatic);
+        final boolean isChromatic = this.isChromatic();
+        if (configuration.isScaleInKey() == isChromatic)
+            configuration.setScaleInKey(!isChromatic);
 
-        final String scaleLayoutName = this.getScaleLayout ().getName ();
-        if (!configuration.getScaleLayout ().equals (scaleLayoutName))
-            configuration.setScaleLayout (scaleLayoutName);
+        final String scaleLayoutName = this.getScaleLayout().getName();
+        if (!configuration.getScaleLayout().equals(scaleLayoutName))
+            configuration.setScaleLayout(scaleLayoutName);
     }
-
 
     /**
      * Get the default octave.
      *
      * @return The default octave
      */
-    public int getDefaultOctave ()
-    {
+    public int getDefaultOctave() {
         return this.defaultOctave;
     }
 }
