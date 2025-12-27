@@ -60,6 +60,12 @@ Each lane step stores:
 
 > **Important**: Even in `RAMP` mode, the script purposefully **does not spam CCs**. It simply places CC points at each active step and relies on Bitwig’s internal ramping between these points.
 
+### Storage and Synchronization
+
+- The parameter pattern is **stored in-memory inside the Parameter Sequencer view**.
+- When entering or re-syncing the view, data is **re-derived from the current Bitwig clip** (CC points and, where possible, curve/slope metadata).
+- There is no separate persistent store: the **clip itself is the source of truth** for long-term storage.
+
 ---
 
 ## MIDI / Automation Mapping
@@ -221,9 +227,14 @@ Later feature (not in MVP, but design-aware):
 - **Program / Channel support in v1**: v1 is **CC-only**. Program and channel changes are planned as future extensions via dedicated lane types, not part of the MVP.
 - **HOLD vs RAMP granularity**: **Per-lane mode** (HOLD or RAMP) for v1, with the internal step data model prepared for per-step overrides in a later version.
 - **Lane focus & mode controls**: In Param view, **ROW1_i** selects the focused lane and **ROW2_i** toggles that lane’s mode between HOLD and RAMP.
-- **Ramp curve behaviour & modifier**: In RAMP mode, **`SHIFT + encoder`** (Param view only) changes **Bitwig’s own automation curve/slope value** for the CC segment between two active steps, while plain encoder turns still set values.
+- **Ramp curve behaviour & modifier**: In RAMP mode, **`SHIFT + encoder`** (Param view only) changes **Bitwig’s own automation curve/slope value** for the CC segment between two active steps, while plain encoder turns still set values; curve changes are applied **live per encoder move** as far as the Bitwig API allows.
 - **CC page navigation**: In Param view, **Page Left/Right** remain time/step pagers; **`SHIFT + Page Left/Right`** is reserved for CC page up/down across CC ranges (1–8, 9–16, 17–24, ...).
-- **NoteViewSelect integration**: Parameter Sequencer entries (lane-focus and, later, lane overview) live in the **advanced SHIFT bank** of `NoteViewSelectMode`, sharing the same two-bank Note/Play selector model as the Push 1 ratchet/polymeter sequencer. The **primary bank** retains only the original NoteViewSelect views; Parameter Sequencer entries appear **only** in the advanced bank, using **column 2 (lane-focus)** and **column 3 (overview)** on the Sequence (top) row, consistent with the advanced-bank layout defined in the Push 1 sequencer devplan.
+- **Lane overview access model**: When implemented, the lane overview layout is handled by the **same underlying Parameter Sequencer view**, using an **internal layout flag** (FOCUS vs OVERVIEW). Two NoteViewSelect entries (e.g. ROW1_5 and ROW1_6) both select this view but switch its layout flag, acting as a latching toggle between lane-focus and overview.
+- **Persistence model**: The Parameter Sequencer uses a **clip-as-truth, in-memory cache** model: lane/step/curve data lives in-memory while the view is active and is **re-derived from the clip** when entering or resyncing the view.
+- **In-memory storage**: The parameter pattern is stored in-memory inside the Parameter Sequencer view, re-derived from the current Bitwig clip when entering or resyncing the view.
+- **Live curve updates**: When the Bitwig API allows, curve changes are applied **live per encoder move**.
+
+---
 
 ## Open Decisions / Implementation Notes
 
@@ -244,3 +255,9 @@ Later feature (not in MVP, but design-aware):
   - Ensure they don't conflict with clip-level or track-level routing.
 
 This document defines the MVP behaviour and structure for the Push Parameter Sequencer mode as an automation layer that integrates tightly with Bitwig clips and existing note sequencers, using the same instrument channel and leveraging Bitwig's internal ramping between CC points.
+
+---
+
+## Status & rollout tracking
+
+Implementation progress and rollout decisions for this mode and its Note/Play selector slots are tracked centrally in `devplans/status.md` under *Sequencer Modes & Note/Play Selector*.

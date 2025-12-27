@@ -75,24 +75,25 @@
 
 - **Base interaction principle**
   - Ratchet amounts should be **fast to toggle** while playing but **hard to hit by accident**.
-  - Re-use an existing modifier (e.g. `SHIFT` or a performance button) + pad to change ratchet for that step.
+  - Use `SHIFT` as the ratchet modifier in this mode: `SHIFT + step pad` changes the ratchet for that step.
 
-- **Per-step editing gesture (candidate)**
-  - **Gesture idea A (cycle per pad)**
+- **Per-step editing gesture (candidates, v1 choice locked)**
+  - **Gesture idea A (cycle per pad) – v1 choice**
     - While in sequencer mode, hold a **ratchet modifier** (e.g. SHIFT or Repeat) and **tap a step pad**.
-    - Each tap **cycles ratchetFactor** for that step:
+    - Each tap **cycles `ratchetFactor`** for that step:
       - `1× → 2× → 3× → 4× → 5× → 6× → 7× → 8× → 1× → ...`.
     - Pros: very quick, no extra controls required.
     - Cons: limited visibility of which factor is currently active without clear feedback.
 
-  - **Gesture idea B (direct selection)**
+  - **Gesture idea B (direct selection – not chosen for v1)**
     - Use a small set of **encoder positions or dedicated pads** to directly set 1×/2×/3×/4× for the **selected step(s)**.
     - Pros: clearer mapping; easier to support more than 4 values later.
     - Cons: slightly slower in performance.
 
-- **Multi-step editing**
-  - Allow selecting **a range of steps** (e.g. by pressing and dragging across pads) and then applying a ratchet factor to all of them at once.
-  - Useful for quickly creating patterns like “every other hat is ratcheted at 2×”.
+- **Multi-step editing (v1 choice – drag selection + SHIFT)**
+  - Use the existing pad drag gesture to select **a range of steps**.
+  - While a selection is active, **hold SHIFT and tap any pad in the selection** to apply the next ratchet value to **all selected steps** at once (cycling as per Gesture A).
+  - Useful for quickly creating patterns like “every other hat is ratcheted at 2×” or densifying fills across a block of steps.
 
 - **Visual feedback on pads** (conceptual)
   - Distinguish ratcheted vs non-ratcheted steps using **pad colour, brightness, or blink rate**.
@@ -389,3 +390,21 @@
     - **Bar** *(default)* – apply queued changes at the start of the next bar.
     - **Pattern Cycle** – apply queued changes at the start of the next full pattern cycle.
   - **Default**: Bar, to match common clip quantization behaviour; Pattern Cycle remains available as an advanced alternative if needed later.
+
+### 7.7 Ratchet editing gesture
+
+- **Decision – Use Gesture idea A (SHIFT + pad cycle) for v1**
+  - While in sequencer mode, hold **SHIFT** and tap the step pad to cycle `ratchetFactor` through `{1,2,3,4,5,6,7,8}`.
+
+### 7.8 Multi-step ratchet editing UX
+
+- **Decision – Use drag selection + SHIFT to edit multiple steps at once**
+  - Use the pad drag gesture to select a contiguous range of steps, then **hold SHIFT and tap any pad in the selection** to cycle `ratchetFactor` for all selected steps together.
+- **Alternative (not chosen for v1)**
+  - A lane-wide gesture (e.g. `SHIFT + encoder` to change all steps in a lane) remains a possible future addition if needed for coarse operations.
+
+---
+
+## Status & rollout tracking
+
+Implementation progress and rollout decisions for this mode and its Note/Play selector integration are tracked centrally in `devplans/status.md` under *Sequencer Modes & Note/Play Selector*.

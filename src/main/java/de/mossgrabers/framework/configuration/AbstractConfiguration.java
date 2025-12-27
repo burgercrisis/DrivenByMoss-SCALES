@@ -1121,6 +1121,11 @@ public abstract class AbstractConfiguration implements Configuration
         {
             final CustomScaleLibrary library = new CustomScaleLibrary (CustomScaleLibrary.getDefaultFile ());
             final List<CustomScale> existing = library.loadAll ();
+
+            final String error = library.getLastError ();
+            if (error != null && !error.isEmpty ())
+                this.host.showNotification ("Custom Scales: " + error);
+
             for (int i = 0; i < existing.size () && i < CUSTOM_SCALE_SLOTS; i++)
             {
                 final CustomScale scale = existing.get (i);
