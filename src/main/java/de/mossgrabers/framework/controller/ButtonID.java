@@ -9,8 +9,7 @@ package de.mossgrabers.framework.controller;
  *
  * @author Jürgen Moßgraber
  */
-public enum ButtonID
-{
+public enum ButtonID {
     /** The play button. */
     PLAY,
     /** The button for stop. */
@@ -143,6 +142,8 @@ public enum ButtonID
 
     /** The edit Scales button. */
     SCALES,
+    /** The create custom scale button. */
+    SCALE_CREATE,
     /** The accent button. */
     ACCENT,
     /** The Layout button. */
@@ -854,19 +855,16 @@ public enum ButtonID
     /** More pads 64. */
     MORE_PADS64;
 
-
     /**
      * Get an offset button ID, e.g. to get F4 set F1 and 3 as parameters.
      *
      * @param buttonID The base button ID
-     * @param offset The offset
+     * @param offset   The offset
      * @return The offset button
      */
-    public static ButtonID get (final ButtonID buttonID, final int offset)
-    {
-        return ButtonID.values ()[buttonID.ordinal () + offset];
+    public static ButtonID get(final ButtonID buttonID, final int offset) {
+        return ButtonID.values()[buttonID.ordinal() + offset];
     }
-
 
     /**
      * Test if the given button ID belongs to a scene button.
@@ -874,11 +872,9 @@ public enum ButtonID
      * @param buttonID The button ID to test
      * @return True if it is a scene button
      */
-    public static boolean isSceneButton (final ButtonID buttonID)
-    {
-        return isInRange (buttonID, ButtonID.SCENE1, 8);
+    public static boolean isSceneButton(final ButtonID buttonID) {
+        return isInRange(buttonID, ButtonID.SCENE1, 8);
     }
-
 
     /**
      * Test if the given button ID belongs to a pad.
@@ -886,27 +882,24 @@ public enum ButtonID
      * @param buttonID The button ID to test
      * @return True if it is a pad
      */
-    public static boolean isPad (final ButtonID buttonID)
-    {
-        return isInRange (buttonID, ButtonID.PAD1, 88);
+    public static boolean isPad(final ButtonID buttonID) {
+        return isInRange(buttonID, ButtonID.PAD1, 88);
     }
-
 
     /**
      * Test if the given button ID belongs to a pad.
      *
-     * @param buttonID The ID of the button to test
+     * @param buttonID      The ID of the button to test
      * @param firstButtonID The ID of the first button in the range
-     * @param length The number of buttons in the range
+     * @param length        The number of buttons in the range
      * @return True if it is in the range
      */
-    public static boolean isInRange (final ButtonID buttonID, final ButtonID firstButtonID, final int length)
-    {
+    public static boolean isInRange(final ButtonID buttonID, final ButtonID firstButtonID, final int length) {
         if (buttonID == null)
             return false;
 
-        final int pos = buttonID.ordinal ();
-        final int firstPos = firstButtonID.ordinal ();
+        final int pos = buttonID.ordinal();
+        final int firstPos = firstButtonID.ordinal();
         final int lastPos = firstPos + length - 1;
         return pos >= firstPos && pos <= lastPos;
     }
